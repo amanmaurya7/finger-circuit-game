@@ -540,7 +540,13 @@
             [16, 19],
             // Bottom curved section
             [20, 23]
-          ]
+          ],
+          // Add path progression tracking for better accuracy calculation
+          pathProgression: 0,          // Current progress along the circuit path (0-100%)
+          lastSegmentIndex: 0,         // Last closest segment for path progression
+          segmentWeights: {},          // Weights for different segments (visible segments are more important)
+          accuracyPoints: 0,           // Points earned for accuracy
+          totalPossiblePoints: 0       // Total possible accuracy points
         };
 
         // Set canvas size
@@ -933,8 +939,23 @@
           const dy = lastPoint.y - gameState.startPoint.y;
           const distance = Math.sqrt(dx * dx + dy * dy);
 
+          // Check if we've drawn enough path to consider completion
+          // This verifies we've made some minimum progress along the circuit
+          const minPathLength = 100; // Minimum path points to be considered a valid attempt
+          const minDistanceTraveled = canvas.width * 0.6; // Must travel at least 60% of canvas width
+          
+          // Calculate total distance traveled
+          let totalDistance = 0;
+          for (let i = 1; i < gameState.userPath.length; i++) {
+            const prev = gameState.userPath[i-1];
+            const curr = gameState.userPath[i];
+            totalDistance += distanceBetween(prev, curr);
+          }
+
           // If we're back near the start point and have drawn enough
-          if (distance < gameState.completionThreshold) {
+          if (distance < gameState.completionThreshold && 
+              gameState.userPath.length >= minPathLength &&
+              totalDistance >= minDistanceTraveled) {
             calculateAccuracy();
             return true;
           }
@@ -944,34 +965,119 @@
 
         // IMPROVED: Calculate accuracy by comparing user path to ideal path
         function calculateAccuracy() {
-          // Sample points along both paths and compare distances
-          let totalPoints = 0;
-          let pointsOnPath = 0;
+          // Initialize accuracy tracking variables
+          gameState.accuracyPoints = 0;
+          gameState.totalPossiblePoints = 0;
           
-          // Check each point in the user's path
-          for (let i = 0; i < gameState.userPath.length; i++) {
-            const point = gameState.userPath[i];
-            
-            // Find closest point on the circuit path
-            const closest = findClosestPointOnPath(point);
-            
-            // If point is within the path width, count it as on the path
-            if (closest.distance <= gameState.pathWidth) {
-              pointsOnPath++;
+          // Set higher weights for visible segments
+          gameState.segmentWeights = {};
+          gameState.visibleSegments.forEach(segment => {
+            for (let i = segment[0]; i <= segment[1]; i++) {
+              gameState.segmentWeights[i] = 2.0; // Visible segments worth double
             }
-            
-            totalPoints++;
+          });
+          
+          // If the user path is too short, accuracy is 0
+          if (gameState.userPath.length < 10) {
+            gameState.accuracy = 0;
+            document.getElementById("accuracyResult").textContent = gameState.accuracy;
+            return;
           }
           
-          // Calculate percentage of points that were on the path
-          gameState.accuracy = Math.round((pointsOnPath / totalPoints) * 100);
+          // Check each point in the user path 
+          // Skip some points to avoid excessive calculation
+          const samplingRate = Math.max(1, Math.floor(gameState.userPath.length / 100));
+          
+          let onTrackPoints = 0;
+          let totalPoints = 0;
+          
+          for (let i = 0; i < gameState.userPath.length; i += samplingRate) {
+            const point = gameState.userPath[i];
+            totalPoints++;
+            
+            // Find the closest segment on the circuit path
+            let minDist = Infinity;
+            let closestSegmentIndex = -1;
+            
+            // Check all segments of the circuit path
+            for (let j = 0; j < gameState.circuitPath.length - 1; j++) {
+              const p1 = gameState.circuitPath[j];
+              const p2 = gameState.circuitPath[j + 1];
+              
+              // Find closest point on this segment
+              const closest = closestPointOnSegment(point, p1, p2);
+              const dist = distanceBetween(point, closest);
+              
+              if (dist < minDist) {
+                minDist = dist;
+                closestSegmentIndex = j;
+              }
+            }
+            
+            // Determine if the point is on track (within pathWidth of the closest segment)
+            const onTrack = minDist <= gameState.pathWidth;
+            
+            // If on track, add points based on segment weight
+            if (onTrack) {
+              const weight = gameState.segmentWeights[closestSegmentIndex] || 1.0;
+              onTrackPoints += weight;
+              gameState.accuracyPoints += weight;
+            }
+            
+            // Add to total possible points
+            const segmentWeight = gameState.segmentWeights[closestSegmentIndex] || 1.0;
+            gameState.totalPossiblePoints += segmentWeight;
+          }
+          
+          // Calculate circuit completion percentage
+          // Check if the user completed the full circuit by verifying the user path
+          // reaches both the start and end points and covers key segments
+          let completionFactor = 1.0;
+          
+          // Check if the user hit all visible segments
+          const hitSegments = new Set();
+          for (let i = 0; i < gameState.userPath.length; i += samplingRate) {
+            const point = gameState.userPath[i];
+            
+            // Find closest segment
+            gameState.visibleSegments.forEach(segment => {
+              for (let j = segment[0]; j <= segment[1]; j++) {
+                if (j < gameState.circuitPath.length - 1) {
+                  const p1 = gameState.circuitPath[j];
+                  const p2 = gameState.circuitPath[j + 1];
+                  const closest = closestPointOnSegment(point, p1, p2);
+                  const dist = distanceBetween(point, closest);
+                  
+                  if (dist <= gameState.pathWidth * 1.5) { // Slightly more generous for segment detection
+                    hitSegments.add(j);
+                  }
+                }
+              }
+            });
+          }
+          
+          // Check if all visible segments were hit
+          const visibleSegmentCount = gameState.visibleSegments.reduce(
+            (count, segment) => count + (segment[1] - segment[0] + 1), 0
+          );
+          
+          // Apply completion penalty if significant segments were missed
+          const hitSegmentCount = hitSegments.size;
+          const segmentCompletionRatio = Math.min(1.0, hitSegmentCount / (visibleSegmentCount * 0.7));
+          completionFactor *= segmentCompletionRatio;
+          
+          // Calculate overall accuracy
+          const rawAccuracy = gameState.accuracyPoints / Math.max(1, gameState.totalPossiblePoints);
+          gameState.accuracy = Math.round(rawAccuracy * completionFactor * 100);
           
           // Ensure accuracy is between 0 and 100
           gameState.accuracy = Math.max(0, Math.min(100, gameState.accuracy));
 
           // Update UI immediately
           document.getElementById("accuracyResult").textContent = gameState.accuracy;
-          console.log("Accuracy calculated: " + gameState.accuracy + "%");
+          console.log("Accuracy calculated: " + gameState.accuracy + "% (points: " + 
+                     gameState.accuracyPoints + "/" + gameState.totalPossiblePoints + 
+                     ", completion: " + Math.round(completionFactor * 100) + "%)");
         }
 
         // Resample a path to have a specific number of points
