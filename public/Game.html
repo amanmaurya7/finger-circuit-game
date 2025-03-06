@@ -190,6 +190,21 @@
         transition: opacity 0.5s ease;
       }
 
+      .white-belt {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.8);
+        z-index: 5;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+      }
+
       /* New result modal styling to match the image */
       .result-screen {
         position: fixed;
@@ -299,6 +314,40 @@
         color: #333;
       }
 
+      /* Touch indicator for better feedback */
+      .touch-indicator {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background-color: transparent; /* Changed from rgba(255, 0, 0, 0.5) to transparent */
+        pointer-events: none;
+        transform: translate(-50%, -50%);
+        z-index: 100;
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+
+      /* Start tooltip */
+      .start-tooltip {
+        position: absolute;
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: 8px;
+        padding: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        font-size: 14px;
+        max-width: 200px;
+        text-align: center;
+        z-index: 5;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+      }
+
       /* Media queries for different screen sizes */
       @media screen and (max-height: 500px) {
         .title-banner {
@@ -390,6 +439,9 @@
       <!-- White belt (initial instructions) -->
       <div id="whiteBelt" class="white-belt"></div>
 
+      <!-- Touch indicator for better feedback -->
+      <div id="touchIndicator" class="touch-indicator"></div>
+
       <!-- New Result screen that matches the image -->
       <div id="resultScreen" class="result-screen">
         <div class="result-modal">
@@ -434,8 +486,9 @@
         // Get canvas and context
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
+        const touchIndicator = document.getElementById("touchIndicator");
 
-        // Game state and variables - MOVED UP before any functions that use it
+        // Game state and variables
         const gameState = {
           status: "initializing", // initializing, ready, playing, completed
           difficulty: "beginner",
@@ -443,12 +496,16 @@
           lastPoint: null,
           isDrawing: false,
           startPoint: { x: 0, y: 0 }, // Will be set properly in initializeCircuitPath
-          startRadius: 8, // Reduced from 12 to 8
+          startRadius: 8, // Reduced for better precision
           circuitPath: [],
           completionThreshold: 20, // Distance to consider the circuit completed when returning to start
           accuracy: 0,
-          minDrawDistance: 2, // Minimum distance between drawn points (reduce for better sensitivity)
-          interpolationPoints: 2, // Add extra points between touch points for smoother curves
+          minDrawDistance: 1, // IMPROVED: Reduced for better sensitivity (was 2)
+          interpolationPoints: 5, // IMPROVED: Increased for smoother curves (was 2)
+          pathWidth: 15, // Width of the circuit path for accuracy calculation
+          redrawScheduled: false,
+          touchActive: false, // Track if touch is active for better responsiveness
+          lastTouchTime: 0, // Track last touch time for better responsiveness
         };
 
         // Set canvas size
@@ -511,7 +568,6 @@
             { x: 115, y: 155 },
 
             // S-curve section
-            // { x: 120, y: 135 },
             { x: 130, y: 180 },
             { x: 90, y: 200 },
             { x: 90, y: 220 },
@@ -520,11 +576,10 @@
             { x: 150, y: 250 },
             { x: 205, y: 230 },
             { x: 180, y: 300 },
-            { x: 135, y: 340 }, // 1
+            { x: 135, y: 340 },
 
             // Horizontal middle section
             { x: 200, y: 320 },
-            // { x: 245, y: 360 },
 
             // Right curve down
             { x: 265, y: 390 },
@@ -534,13 +589,9 @@
             { x: 270, y: 480 },
             { x: 270, y: 400 },
             { x: 240, y: 300 },
-            // { x: 190, y: 325 },
 
             // Return path
-            // { x: 200, y: 310 }, // 1
-            // { x: 200, y: 300 },
             { x: 200, y: 280 },
-            // { x: 90, y: 285 },
             { x: 180, y: 260 },
             { x: 73, y: 250 },
             { x: 73, y: 150 },
@@ -582,16 +633,35 @@
           const startArrowElem = document.getElementById("startArrow");
 
           startPointElem.style.left = `${gameState.startPoint.x - 50}px`;
-          startPointElem.style.top = `${gameState.startPoint.y - -150}px`;
+          startPointElem.style.top = `${gameState.startPoint.y + 150}px`;
 
-          startArrowElem.style.left = `${gameState.startPoint.x - 30}px`;
-          startArrowElem.style.top = `${gameState.startPoint.y - -50}px`;
+          startArrowElem.style.left = `${gameState.startPoint.x - 25}px`;
+          startArrowElem.style.top = `${gameState.startPoint.y + 60}px`;
+        }
+
+        // Show start tooltip
+        function showStartTooltip() {
+          const tooltip = document.createElement("div");
+          tooltip.className = "start-tooltip";
+          tooltip.textContent = "";
+          tooltip.style.left = `${gameState.startPoint.x - 100}px`;
+          tooltip.style.top = `${gameState.startPoint.y + 100}px`;
+          document.body.appendChild(tooltip);
+          
+          // Remove tooltip after 5 seconds or when game starts
+          setTimeout(() => {
+            if (document.body.contains(tooltip)) {
+              document.body.removeChild(tooltip);
+            }
+          }, 5000);
+          
+          // Store reference to remove it when game starts
+          gameState.startTooltip = tooltip;
         }
 
         // Draw the circuit guidelines
         function drawCircuit() {
-          // Don't clear the entire canvas to keep the map visible
-          // Only clear the area where we'll draw the path
+          // Clear the entire canvas to keep the map visible
           ctx.clearRect(0, 0, canvas.width, canvas.height);
 
           // Draw the circuit path with smooth corners (blue lines)
@@ -615,7 +685,8 @@
           const last = gameState.circuitPath[gameState.circuitPath.length - 1];
           ctx.lineTo(last.x, last.y);
 
-          ctx.strokeStyle = "rgba(0, 0, 255, 0.7)"; // Semi-transparent blue
+          // IMPROVED: More visible blue line
+          ctx.strokeStyle = "rgba(0, 100, 255, 0.8)"; // Brighter blue
           ctx.lineWidth = 6;
           ctx.stroke();
 
@@ -635,7 +706,7 @@
           if (gameState.status === "ready") {
             // Draw outer circle with animation - smaller pulse size
             const pulseSize =
-              gameState.startRadius * 1.25 + Math.sin(Date.now() / 200) * 2;
+              gameState.startRadius * 1.5 + Math.sin(Date.now() / 200) * 3;
             ctx.beginPath();
             ctx.arc(
               gameState.startPoint.x,
@@ -645,18 +716,8 @@
               Math.PI * 2
             );
             ctx.strokeStyle = "#ff6699";
-            ctx.lineWidth = 1.5;
+            ctx.lineWidth = 2;
             ctx.stroke();
-
-            // Add "Start Here" text - adjusted position for smaller circle
-            ctx.font = "10px Arial";
-            ctx.fillStyle = "#ff6699";
-            ctx.textAlign = "center";
-            ctx.fillText(
-              "",
-              gameState.startPoint.x,
-              gameState.startPoint.y + gameState.startRadius * 2.2
-            );
 
             // Request animation frame to keep pulsing
             if (gameState.status === "ready") {
@@ -691,9 +752,9 @@
             ctx.lineTo(last.x, last.y);
           }
 
-          // Use a more visible color for the user's path - red with higher opacity
-          ctx.strokeStyle = "rgba(255, 0, 0, 0.8)"; 
-          ctx.lineWidth = 4;
+          // IMPROVED: More visible user path
+          ctx.strokeStyle = "rgba(255, 0, 0, 0.9)"; // Brighter red
+          ctx.lineWidth = 5;
           ctx.lineCap = "round"; // Add rounded ends to the line
           ctx.lineJoin = "round"; // Add rounded corners
           ctx.stroke();
@@ -719,7 +780,8 @@
           const last = gameState.circuitPath[gameState.circuitPath.length - 1];
           ctx.lineTo(last.x, last.y);
 
-          ctx.strokeStyle = "rgba(0, 0, 255, 0.4)"; // More transparent blue
+          // IMPROVED: More visible blue line
+          ctx.strokeStyle = "rgba(0, 100, 255, 0.5)"; // Brighter blue but transparent
           ctx.lineWidth = 6;
           ctx.stroke();
         }
@@ -737,6 +799,61 @@
           }
           
           return points;
+        }
+
+        // IMPROVED: Find the closest point on the circuit path to a given point
+        function findClosestPointOnPath(point) {
+          let minDist = Infinity;
+          let closestPoint = null;
+          
+          // Check against each segment of the path
+          for (let i = 0; i < gameState.circuitPath.length - 1; i++) {
+            const p1 = gameState.circuitPath[i];
+            const p2 = gameState.circuitPath[i + 1];
+            
+            // Find closest point on this segment
+            const closest = closestPointOnSegment(point, p1, p2);
+            const dist = distanceBetween(point, closest);
+            
+            if (dist < minDist) {
+              minDist = dist;
+              closestPoint = closest;
+            }
+          }
+          
+          return { point: closestPoint, distance: minDist };
+        }
+
+        // Find the closest point on a line segment to a given point
+        function closestPointOnSegment(p, v, w) {
+          // Return minimum distance between line segment vw and point p
+          const l2 = distanceSquared(v, w);  // i.e. |w-v|^2
+          
+          // Consider the line extending the segment, parameterized as v + t (w - v)
+          // We find projection of point p onto the line.
+          // It falls where t = [(p-v) . (w-v)] / |w-v|^2
+          // We clamp t from [0,1] to handle points outside the segment vw
+          
+          if (l2 === 0) return v; // v == w case
+          
+          // Consider the line extending the segment, parameterized as v + t (w - v)
+          let t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
+          t = Math.max(0, Math.min(1, t));
+          
+          return {
+            x: v.x + t * (w.x - v.x),
+            y: v.y + t * (w.y - v.y)
+          };
+        }
+
+        // Calculate squared distance between two points
+        function distanceSquared(v, w) {
+          return Math.pow(v.x - w.x, 2) + Math.pow(v.y - w.y, 2);
+        }
+
+        // Calculate distance between two points
+        function distanceBetween(p1, p2) {
+          return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
         }
 
         // Check if the user has completed the circuit
@@ -757,42 +874,35 @@
           return false;
         }
 
-        // Calculate accuracy by comparing user path to ideal path
+        // IMPROVED: Calculate accuracy by comparing user path to ideal path
         function calculateAccuracy() {
-          // Simple algorithm: sample points along both paths and compare distances
-          let totalDeviation = 0;
-          const samplePoints = 50;
-
-          // Normalize path lengths by resampling
-          const userSamples = resamplePath(gameState.userPath, samplePoints);
-          const idealSamples = resamplePath(
-            gameState.circuitPath,
-            samplePoints
-          );
-
-          // Calculate deviation for each point
-          for (let i = 0; i < samplePoints; i++) {
-            const dx = userSamples[i].x - idealSamples[i].x;
-            const dy = userSamples[i].y - idealSamples[i].y;
-            totalDeviation += Math.sqrt(dx * dx + dy * dy);
+          // Sample points along both paths and compare distances
+          let totalPoints = 0;
+          let pointsOnPath = 0;
+          
+          // Check each point in the user's path
+          for (let i = 0; i < gameState.userPath.length; i++) {
+            const point = gameState.userPath[i];
+            
+            // Find closest point on the circuit path
+            const closest = findClosestPointOnPath(point);
+            
+            // If point is within the path width, count it as on the path
+            if (closest.distance <= gameState.pathWidth) {
+              pointsOnPath++;
+            }
+            
+            totalPoints++;
           }
-
-          // Calculate average deviation and convert to accuracy percentage
-          const avgDeviation = totalDeviation / samplePoints;
-          const maxDeviation = Math.max(canvas.width, canvas.height) / 4; // Reasonable max deviation
-
-          // Convert deviation to accuracy (0-100%)
-          gameState.accuracy = Math.max(
-            0,
-            Math.min(100, 100 - (avgDeviation / maxDeviation) * 100)
-          );
-
-          // Round to whole number
-          gameState.accuracy = Math.round(gameState.accuracy);
+          
+          // Calculate percentage of points that were on the path
+          gameState.accuracy = Math.round((pointsOnPath / totalPoints) * 100);
+          
+          // Ensure accuracy is between 0 and 100
+          gameState.accuracy = Math.max(0, Math.min(100, gameState.accuracy));
 
           // Update UI immediately
-          document.getElementById("accuracyResult").textContent =
-            gameState.accuracy;
+          document.getElementById("accuracyResult").textContent = gameState.accuracy;
           console.log("Accuracy calculated: " + gameState.accuracy + "%");
         }
 
@@ -866,80 +976,77 @@
           return Math.sqrt(dx * dx + dy * dy);
         }
 
+        // IMPROVED: Show visual feedback for touch detection
+        function showTouchFeedback(x, y) {
+          // Function modified to do nothing - this removes the red circle
+          // Original code:
+          // touchIndicator.style.left = `${x}px`;
+          // touchIndicator.style.top = `${y}px`;
+          // touchIndicator.style.opacity = "1";
+          // setTimeout(() => {
+          //   touchIndicator.style.opacity = "0";
+          // }, 200);
+        }
+
         // Handle touch/mouse events
         function handleStart(e) {
           e.preventDefault();
-          console.log("Touch/mouse event detected:", e.type);
-          console.log("Game state:", gameState.status);
+          
+          // Get the touch position
+          const pos = getEventPosition(e);
+          
+          // Remove or comment out the call to showTouchFeedback here
+          // showTouchFeedback(pos.x, pos.y);
+          
+          // Update touch state
+          gameState.touchActive = true;
+          gameState.lastTouchTime = Date.now();
 
-          try {
-            const pos = getEventPosition(e);
-            console.log("Start position:", pos);
+          // Check if we're in ready state (first touch)
+          if (gameState.status === "ready") {
+            // Check if starting near the start point
+            const dx = pos.x - gameState.startPoint.x;
+            const dy = pos.y - gameState.startPoint.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
 
-            // Visual feedback for touch detection
-            showTouchFeedback(pos.x, pos.y);
-
-            // Check if we're in ready state (first touch)
-            if (gameState.status === "ready") {
-              // Check if starting near the start point
-              const dx = pos.x - gameState.startPoint.x;
-              const dy = pos.y - gameState.startPoint.y;
-              const distance = Math.sqrt(dx * dx + dy * dy);
-              console.log(
-                "Distance from start:",
-                distance,
-                "Threshold:",
-                gameState.startRadius * 2
-              );
-
-              // Increase the start point detection radius for better usability
-              if (distance < gameState.startRadius * 3) {
-                // Start drawing
-                gameState.isDrawing = true;
-                gameState.status = "playing";
-                gameState.userPath = [
-                  { x: gameState.startPoint.x, y: gameState.startPoint.y },
-                ];
-                gameState.lastPoint = {
-                  x: gameState.startPoint.x,
-                  y: gameState.startPoint.y,
-                };
-
-                // Fade out start elements and start text
-                document.getElementById("startPoint").style.opacity = "0";
-                document.getElementById("startArrow").style.opacity = "0";
-
-                console.log("Game started successfully!");
-                
-                // Force redraw to show initial state
-                drawCircuit();
-                drawUserPath();
-              } else {
-                console.log("Touch not close enough to start point");
-              }
-            } 
-            // Check if we're already playing but not currently drawing (we lifted finger before)
-            else if (gameState.status === "playing" && !gameState.isDrawing) {
-              // Allow resuming from anywhere - no distance check to last point
+            // IMPROVED: Increased detection radius for better usability
+            if (distance < gameState.startRadius * 4) {
+              // Start drawing
               gameState.isDrawing = true;
+              gameState.status = "playing";
+              gameState.userPath = [
+                { x: gameState.startPoint.x, y: gameState.startPoint.y },
+              ];
+              gameState.lastPoint = {
+                x: gameState.startPoint.x,
+                y: gameState.startPoint.y,
+              };
+
+              // Fade out start elements
+              document.getElementById("startPoint").style.opacity = "0";
+              document.getElementById("startArrow").style.opacity = "0";
               
-              // Add the new point to continue the path
-              if (gameState.lastPoint) {
-                // Optionally, add a small visual gap to indicate lifting the finger
-                // by not directly connecting the lines
-                
-                // Add the current touch point to continue drawing
-                gameState.userPath.push({ x: pos.x, y: pos.y });
-                gameState.lastPoint = { x: pos.x, y: pos.y };
-                
-                console.log("Continuing drawing from new point:", pos);
+              // Remove start tooltip if it exists
+              if (gameState.startTooltip && document.body.contains(gameState.startTooltip)) {
+                document.body.removeChild(gameState.startTooltip);
               }
+
+              // Force redraw to show initial state
+              drawCircuit();
+              drawUserPath();
             }
-          } catch (error) {
-            console.error("Error in handleStart:", error);
-            // Ensure we can still draw even if there's an error
+          } 
+          // Check if we're already playing but not currently drawing (we lifted finger before)
+          else if (gameState.status === "playing" && !gameState.isDrawing) {
+            // Allow resuming from anywhere - no distance check to last point
             gameState.isDrawing = true;
-            gameState.status = "playing";
+            
+            // Add the new point to continue the path
+            if (gameState.lastPoint) {
+              // Add the current touch point to continue drawing
+              gameState.userPath.push({ x: pos.x, y: pos.y });
+              gameState.lastPoint = { x: pos.x, y: pos.y };
+            }
           }
         }
 
@@ -948,75 +1055,77 @@
 
           if (!gameState.isDrawing) return;
 
-          try {
-            const pos = getEventPosition(e);
+          // Get the touch position
+          const pos = getEventPosition(e);
+          
+          // Update touch state
+          gameState.touchActive = true;
+          gameState.lastTouchTime = Date.now();
+          
+          // Remove or comment out the call to showTouchFeedback here
+          // if (Math.random() < 0.2) {
+          //   showTouchFeedback(pos.x, pos.y);
+          // }
 
-            // Calculate distance from last point
-            let addPoint = true;
+          // Calculate distance from last point
+          let addPoint = true;
+          if (gameState.lastPoint) {
+            const dx = pos.x - gameState.lastPoint.x;
+            const dy = pos.y - gameState.lastPoint.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            
+            // Only add point if we've moved far enough (makes line smoother)
+            if (dist < gameState.minDrawDistance) {
+              addPoint = false;
+            }
+          }
+
+          if (addPoint) {
+            // If the distance between points is large, add interpolated points
             if (gameState.lastPoint) {
               const dx = pos.x - gameState.lastPoint.x;
               const dy = pos.y - gameState.lastPoint.y;
               const dist = Math.sqrt(dx * dx + dy * dy);
               
-              // Only add point if we've moved far enough (makes line smoother)
-              // Now using a smaller threshold for better sensitivity
-              if (dist < gameState.minDrawDistance) {
-                addPoint = false;
-              }
-            }
-
-            if (addPoint) {
-              // If the distance between points is large, add interpolated points
-              if (gameState.lastPoint) {
-                const dx = pos.x - gameState.lastPoint.x;
-                const dy = pos.y - gameState.lastPoint.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
+              // If points are far apart, add interpolated points between them
+              if (dist > 10) {
+                const interpolated = interpolatePoints(
+                  gameState.lastPoint,
+                  pos, 
+                  gameState.interpolationPoints
+                );
                 
-                // If points are far apart, add interpolated points between them
-                if (dist > 10) {
-                  const interpolated = interpolatePoints(
-                    gameState.lastPoint,
-                    pos, 
-                    gameState.interpolationPoints
-                  );
-                  
-                  // Skip the first point as it's the same as lastPoint
-                  for (let i = 1; i < interpolated.length; i++) {
-                    gameState.userPath.push(interpolated[i]);
-                  }
-                } else {
-                  // Just add the current point
-                  gameState.userPath.push({ x: pos.x, y: pos.y });
+                // Skip the first point as it's the same as lastPoint
+                for (let i = 1; i < interpolated.length; i++) {
+                  gameState.userPath.push(interpolated[i]);
                 }
               } else {
+                // Just add the current point
                 gameState.userPath.push({ x: pos.x, y: pos.y });
               }
-              
-              gameState.lastPoint = { x: pos.x, y: pos.y };
-              
-              // Visual feedback that drawing is working
-              showTouchFeedback(pos.x, pos.y);
-
-              // Redraw with a small delay to avoid performance issues on slower devices
-              if (!gameState.redrawScheduled) {
-                gameState.redrawScheduled = true;
-                setTimeout(() => {
-                  ctx.clearRect(0, 0, canvas.width, canvas.height);
-                  drawCircuit();
-                  drawUserPath();
-                  gameState.redrawScheduled = false;
-                }, 10);
-              }
-
-              // Check for completion
-              if (checkCompletion()) {
-                gameState.isDrawing = false;
-                gameState.status = "completed";
-                showResultScreen();
-              }
+            } else {
+              gameState.userPath.push({ x: pos.x, y: pos.y });
             }
-          } catch (error) {
-            console.error("Error in handleMove:", error);
+            
+            gameState.lastPoint = { x: pos.x, y: pos.y };
+
+            // Redraw with a small delay to avoid performance issues on slower devices
+            if (!gameState.redrawScheduled) {
+              gameState.redrawScheduled = true;
+              setTimeout(() => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawCircuit();
+                drawUserPath();
+                gameState.redrawScheduled = false;
+              }, 10);
+            }
+
+            // Check for completion
+            if (checkCompletion()) {
+              gameState.isDrawing = false;
+              gameState.status = "completed";
+              showResultScreen();
+            }
           }
         }
 
@@ -1027,36 +1136,9 @@
           // but maintain "playing" state so user can continue
           if (gameState.isDrawing) {
             gameState.isDrawing = false;
-            // Do not change the status - keep it as "playing"
-            console.log("Drawing paused. Touch anywhere to continue.");
+            // Update touch state
+            gameState.touchActive = false;
           }
-        }
-
-        // Add visual feedback for touch detection
-        function showTouchFeedback(x, y) {
-          // Create a small circle that fades out quickly
-          const feedback = document.createElement('div');
-          feedback.style.position = 'absolute';
-          feedback.style.width = '10px';
-          feedback.style.height = '10px';
-          feedback.style.borderRadius = '50%';
-          feedback.style.background = 'rgba(255, 0, 0, 0.7)';
-          feedback.style.left = (canvas.offsetLeft + x - 5) + 'px';
-          feedback.style.top = (canvas.offsetTop + y - 5) + 'px';
-          feedback.style.pointerEvents = 'none'; // Don't interfere with touch events
-          feedback.style.zIndex = '1000';
-          feedback.style.transition = 'opacity 0.2s, transform 0.2s';
-          
-          document.body.appendChild(feedback);
-          
-          // Animate and remove
-          setTimeout(() => {
-            feedback.style.opacity = '0';
-            feedback.style.transform = 'scale(2)';
-            setTimeout(() => {
-              document.body.removeChild(feedback);
-            }, 200);
-          }, 10);
         }
 
         function getEventPosition(e) {
@@ -1073,29 +1155,12 @@
               const rect = canvas.getBoundingClientRect();
               x = touch.clientX - rect.left;
               y = touch.clientY - rect.top;
-              console.log(
-                "Touch position:",
-                touch.clientX,
-                touch.clientY,
-                "Canvas rect:",
-                rect.left,
-                rect.top
-              );
             } else {
               const rect = canvas.getBoundingClientRect();
               x = e.clientX - rect.left;
               y = e.clientY - rect.top;
-              console.log(
-                "Mouse position:",
-                e.clientX,
-                e.clientY,
-                "Canvas rect:",
-                rect.left,
-                rect.top
-              );
             }
 
-            console.log("Event position calculated:", x, y);
             return { x, y };
           } catch (error) {
             console.error("Error in getEventPosition:", error);
@@ -1106,8 +1171,7 @@
         // Show result screen
         function showResultScreen() {
           // Make sure the accuracy result is updated with the calculated value
-          document.getElementById("accuracyResult").textContent =
-            gameState.accuracy;
+          document.getElementById("accuracyResult").textContent = gameState.accuracy;
           document.getElementById("resultScreen").style.display = "flex";
         }
 
@@ -1120,7 +1184,7 @@
             initializeCircuitPath();
             drawCircuit();
 
-            // Show white belt with countdown - SIMPLIFIED
+            // Show white belt with countdown
             const whiteBelt = document.getElementById("whiteBelt");
             const missionBanner = document.querySelector(".mission-banner");
 
@@ -1129,33 +1193,23 @@
             missionBanner.style.opacity = "1";
             gameState.status = "initializing";
 
-            console.log("Game initializing, waiting for ready state...");
-
             // Direct timeout without nesting
             setTimeout(function () {
-              try {
-                whiteBelt.style.opacity = "0";
+              whiteBelt.style.opacity = "0";
+              setTimeout(function () {
+                whiteBelt.style.display = "none";
+                missionBanner.style.opacity = "0";
                 setTimeout(function () {
-                  whiteBelt.style.display = "none";
-                  missionBanner.style.opacity = "0";
-                  setTimeout(function () {
-                    missionBanner.style.display = "none";
-                    gameState.status = "ready";
-                    console.log("Game is now ready! Status:", gameState.status);
-
-                    // Force redraw after ready state
-                    drawCircuit();
-                    
-                    // Show a tooltip to guide the user
-                    showStartTooltip();
-                  }, 500);
+                  missionBanner.style.display = "none";
+                  gameState.status = "ready";
+                  
+                  // Force redraw after ready state
+                  drawCircuit();
+                  
+                  // Show a tooltip to guide the user
+                  showStartTooltip();
                 }, 500);
-              } catch (error) {
-                console.error("Error in ready state transition:", error);
-                // Force game to ready state even if there's an error
-                gameState.status = "ready";
-                drawCircuit();
-              }
+              }, 500);
             }, 2000);
 
             // Remove any existing event listeners to prevent duplicates
@@ -1166,7 +1220,7 @@
             canvas.removeEventListener("touchmove", handleMove);
             canvas.removeEventListener("touchend", handleEnd);
 
-            // Add event listeners with passive: false
+            // Add event listeners with passive: false for better touch handling
             canvas.addEventListener("mousedown", handleStart, {
               passive: false,
             });
@@ -1192,23 +1246,12 @@
             document
               .getElementById("mapButton")
               .addEventListener("click", returnToMap);
-
-            console.log(
-              "Game initialized, canvas size:",
-              canvas.width,
-              "x",
-              canvas.height
-            );
-            console.log("Start point:", gameState.startPoint);
-
-            // Debug the game state immediately
-            debugGameState();
           } catch (error) {
             console.error("Error during game initialization:", error);
           }
         }
 
-        // Reset game - also simplify the timing logic here
+        // Reset game
         function resetGame() {
           // Reset game state
           gameState.status = "initializing";
@@ -1233,8 +1276,6 @@
           missionBanner.style.display = "block";
           missionBanner.style.opacity = "1";
 
-          console.log("Game reset, waiting for ready state...");
-
           // Direct timeout without nesting
           setTimeout(function () {
             whiteBelt.style.opacity = "0";
@@ -1244,29 +1285,62 @@
               setTimeout(function () {
                 missionBanner.style.display = "none";
                 gameState.status = "ready";
-                console.log("Game reset and ready! Status:", gameState.status);
 
                 // Force redraw after ready state
                 drawCircuit();
+                
+                // Show start tooltip again
+                showStartTooltip();
               }, 500);
             }, 500);
           }, 2000);
         }
 
-        // Share result
+        // Share result with screenshot
         function shareResult() {
-          // Implement sharing functionality (could use Web Share API)
-          if (navigator.share) {
-            navigator
-              .share({
-                title: "My Finger Circuit Result",
-                text: `I completed the Finger Circuit with ${gameState.accuracy}% accuracy!`,
-              })
-              .catch(console.error);
+          // Take a screenshot of the result modal
+          const resultModal = document.querySelector(".result-modal");
+          
+          // Create a canvas to draw the screenshot
+          const screenshotCanvas = document.createElement("canvas");
+          const screenshotCtx = screenshotCanvas.getContext("2d");
+          
+          // Set canvas size to match the modal
+          screenshotCanvas.width = resultModal.offsetWidth;
+          screenshotCanvas.height = resultModal.offsetHeight;
+          
+          // Use html2canvas if available, otherwise use a fallback message
+          if (typeof html2canvas !== "undefined") {
+            html2canvas(resultModal).then(canvas => {
+              // Convert to data URL
+              const imageData = canvas.toDataURL("image/png");
+              
+              // Share the image if Web Share API is available
+              if (navigator.share) {
+                fetch(imageData)
+                  .then(res => res.blob())
+                  .then(blob => {
+                    const file = new File([blob], "finger-circuit-score.png", { type: "image/png" });
+                    navigator.share({
+                      title: "My Finger Circuit Result",
+                      text: `I completed the Finger Circuit with ${gameState.accuracy}% accuracy!`,
+                      files: [file]
+                    }).catch(error => {
+                      console.error("Error sharing:", error);
+                      fallbackShare();
+                    });
+                  });
+              } else {
+                fallbackShare();
+              }
+            });
           } else {
-            alert(
-              `You completed the circuit with ${gameState.accuracy}% accuracy! Screenshot to share.`
-            );
+            fallbackShare();
+          }
+          
+          // Fallback sharing method
+          function fallbackShare() {
+            alert(`You completed the circuit with ${gameState.accuracy}% accuracy! Screenshot to share.`);
           }
         }
 
@@ -1276,34 +1350,7 @@
           window.location.href = "index.html"; // Or any other map page
         }
 
-        // Debug function to help troubleshoot issues
-        function debugGameState() {
-          console.log("=== GAME STATE DEBUG ===");
-          console.log("Status:", gameState.status);
-          console.log("Canvas size:", canvas.width, "x", canvas.height);
-          console.log("Start point:", gameState.startPoint);
-          console.log("Is drawing:", gameState.isDrawing);
-          console.log("User path length:", gameState.userPath.length);
-          console.log("Circuit path:", gameState.circuitPath);
-          console.log("=== END DEBUG ===");
-        }
-
-        // Add debug button for mobile testing
-        const debugButton = document.createElement("button");
-        debugButton.textContent = "Debug";
-        debugButton.style.position = "fixed";
-        debugButton.style.bottom = "70px";
-        debugButton.style.right = "10px";
-        debugButton.style.zIndex = "100";
-        debugButton.style.padding = "5px 10px";
-        debugButton.style.background = "#333";
-        debugButton.style.color = "white";
-        debugButton.style.border = "none";
-        debugButton.style.borderRadius = "5px";
-        debugButton.addEventListener("click", debugGameState);
-        document.body.appendChild(debugButton);
-
-        // Start the game - Call resizeCanvas after all functions are defined
+        // Start the game
         resizeCanvas();
         initGame();
       });
