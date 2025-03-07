@@ -342,6 +342,86 @@
         animation: pulse 2s infinite;
       }
 
+      /* Social share modal */
+      .share-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        z-index: 30;
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .share-content {
+        width: 90%;
+        max-width: 350px;
+        background-color: white;
+        border-radius: 12px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .share-title {
+        font-size: 18px;
+        margin-bottom: 15px;
+        text-align: center;
+      }
+
+      .share-image {
+        width: 100%;
+        max-width: 300px;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .share-buttons {
+        display: flex;
+        justify-content: space-around;
+        width: 100%;
+        margin-top: 10px;
+      }
+
+      .share-platform {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 10px;
+        cursor: pointer;
+      }
+
+      .share-platform-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 5px;
+      }
+
+      .share-platform-name {
+        font-size: 12px;
+      }
+
+      .close-share {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: white;
+      }
+
       @keyframes pulse {
         0% { transform: scale(1); }
         50% { transform: scale(1.05); }
@@ -464,6 +544,49 @@
         </div>
       </div>
 
+       <!-- Social Share Modal -->
+       <div id="shareModal" class="share-modal">
+        <button id="closeShare" class="close-share">×</button>
+        <div class="share-content">
+          <div class="share-title">スコアをシェアする</div>
+          <img id="shareImage" class="share-image" alt="Your score" />
+          <div class="share-buttons">
+            <div class="share-platform" data-platform="twitter">
+              <div class="share-platform-icon" style="background-color: #1DA1F2;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                  <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                </svg>
+              </div>
+              <div class="share-platform-name">Twitter</div>
+            </div>
+            <div class="share-platform" data-platform="facebook">
+              <div class="share-platform-icon" style="background-color: #1877F2;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                </svg>
+              </div>
+              <div class="share-platform-name">Facebook</div>
+            </div>
+            <div class="share-platform" data-platform="line">
+              <div class="share-platform-icon" style="background-color: #06C755;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                  <path d="M19.365 9.89c.50 0 .907.41.907.91 0 .5-.407.91-.907.91H17.59v1.306h1.775c.5 0 .907.41.907.91 0 .5-.407.91-.907.91H16.59c-.5 0-.908-.41-.908-.91V9.89c0-.5.407-.91.908-.91h2.775zm-5.442 4.036c.5 0 .907.41.907.91 0 .5-.407.91-.907.91h-2.775c-.5 0-.907-.41-.907-.91V9.89c0-.5.407-.91.907-.91.5 0 .908.41.908.91v3.126h1.867zm-4.75-3.126c.5 0 .908.41.908.91 0 .5-.408.91-.908.91H7.407v.406h1.766c.5 0 .908.41.908.91 0 .5-.408.91-.908.91H7.407v.406h1.766c.5 0 .908.41.908.91 0 .5-.408.91-.908.91H6.407c-.5 0-.907-.41-.907-.91V9.89c0-.5.407-.91.907-.91h2.766zm10.256-2.895C20.418 6.33 21 5.19 21 3.994 21 2.893 19.978 2 18.672 2c-1.307 0-2.33.893-2.33 1.994 0 .893.558 1.674 1.388 1.92.168.056.28.224.28.392v.073c0 .112-.056.224-.168.28-.056.056-.112.056-.168.056h-.336c-2.33 0-4.494.955-6.16 2.546-1.667 1.59-2.666 3.746-2.666 6.068 0 4.71 3.972 8.566 8.826 8.566 4.855 0 8.826-3.856 8.826-8.566 0-1.87-.67-3.69-1.89-5.156-.112-.112-.112-.336 0-.448.112-.112.28-.112.392-.056.67.336 1.307.728 1.89 1.19.112.112.28.112.392 0 .112-.112.112-.28 0-.392-2.053-2.21-4.83-3.466-7.77-3.466h-.28c-.112 0-.224-.056-.28-.168-.056-.112-.056-.224 0-.336.112-.224.224-.448.28-.67z"/>
+                </svg>
+              </div>
+              <div class="share-platform-name">LINE</div>
+            </div>
+            <div class="share-platform" data-platform="download">
+              <div class="share-platform-icon" style="background-color: #333;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                  <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                </svg>
+              </div>
+              <div class="share-platform-name">Save</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Navigation bar -->
       <div class="nav-bar">
         <a href="index.html" class="nav-icon">
@@ -492,13 +615,7 @@
           <span>CIRCUIT</span>
         </a>
         <a href="#" class="nav-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="26" viewBox="0 0 32 26">
-            <g id="MENU" transform="translate(1 1)">
-              <line id="Line_6" data-name="Line 6" x2="30" fill="none" stroke="#fff" stroke-linecap="round" stroke-width="2"/>
-              <line id="Line_7" data-name="Line 7" x2="30" transform="translate(0 12)" fill="none" stroke="#fff" stroke-linecap="round" stroke-width="2"/>
-              <line id="Line_8" data-name="Line 8" x2="30" transform="translate(0 24)" fill="none" stroke="#fff" stroke-linecap="round" stroke-width="2"/>
-            </g>
-          </svg>
+        
           <span></span>
         </a>
       </div>
@@ -529,24 +646,17 @@
           redrawScheduled: false,
           touchActive: false, // Track if touch is active for better responsiveness
           lastTouchTime: 0, // Track last touch time for better responsiveness
-          // Define which segments of the circuit should be visible
-          visibleSegments: [
-            // Segment indices based on the image
-            // Vertical line at top left
-            [0, 2],
-            // Curved section in upper middle
-            [7, 10],
-            // Horizontal middle section
-            [16, 19],
-            // Bottom curved section
-            [20, 23]
-          ],
+          
           // Add path progression tracking for better accuracy calculation
           pathProgression: 0,          // Current progress along the circuit path (0-100%)
           lastSegmentIndex: 0,         // Last closest segment for path progression
-          segmentWeights: {},          // Weights for different segments (visible segments are more important)
           accuracyPoints: 0,           // Points earned for accuracy
-          totalPossiblePoints: 0       // Total possible accuracy points
+          totalPossiblePoints: 0,      // Total possible accuracy points
+          segmentsVisited: new Set(),  // Track which segments the user has visited
+          visitedInOrder: [],          // Track segments visited in order
+          minCircuitCoverage: 0.7,     // Minimum percentage of circuit that must be covered
+          fullLoopRequired: true,      // Require a full loop for high accuracy
+          lastCheckpointIndex: -1      // Last checkpoint segment index reached
         };
 
         // Set canvas size
@@ -609,6 +719,7 @@
             { x: 115, y: 155 },
 
             // S-curve section
+            // { x: 120, y: 135 },
             { x: 130, y: 180 },
             { x: 90, y: 200 },
             { x: 90, y: 220 },
@@ -617,10 +728,11 @@
             { x: 150, y: 250 },
             { x: 205, y: 230 },
             { x: 180, y: 300 },
-            { x: 135, y: 340 },
+            { x: 135, y: 340 }, // 1
 
             // Horizontal middle section
             { x: 200, y: 320 },
+            // { x: 245, y: 360 },
 
             // Right curve down
             { x: 265, y: 390 },
@@ -630,10 +742,14 @@
             { x: 270, y: 480 },
             { x: 270, y: 400 },
             { x: 240, y: 300 },
+            // { x: 190, y: 325 },
 
             // Return path
-            { x: 200, y: 280 },
-            { x: 180, y: 260 },
+            // { x: 200, y: 310 }, // 1
+            // { x: 200, y: 300 },
+            { x: 200, y: 300 },
+            // { x: 90, y: 285 },
+            { x: 180, y: 270 },
             { x: 73, y: 250 },
             { x: 73, y: 150 },
           ];
@@ -700,49 +816,36 @@
           gameState.startTooltip = tooltip;
         }
 
-        // Draw the circuit guidelines
+        // Draw the circuit guidelines - modified to show the entire circuit
         function drawCircuit() {
           // Clear the entire canvas to keep the map visible
           ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-          // Draw only the visible segments of the circuit path
-          gameState.visibleSegments.forEach(segment => {
-            const startIdx = segment[0];
-            const endIdx = segment[1];
+          // Draw the entire circuit path with smooth corners
+          ctx.beginPath();
+          ctx.moveTo(gameState.circuitPath[0].x, gameState.circuitPath[0].y);
+          
+          // Use bezier curves for a smoother path
+          for (let i = 1; i < gameState.circuitPath.length - 1; i++) {
+            const current = gameState.circuitPath[i];
+            const next = gameState.circuitPath[i + 1];
             
-            // Draw this segment with smooth corners
-            ctx.beginPath();
-            ctx.moveTo(gameState.circuitPath[startIdx].x, gameState.circuitPath[startIdx].y);
+            // Calculate control points for the curve
+            const xc = (current.x + next.x) / 2;
+            const yc = (current.y + next.y) / 2;
             
-            // Use bezier curves for the points in this segment
-            for (let i = startIdx + 1; i < endIdx; i++) {
-              const current = gameState.circuitPath[i];
-              const next = gameState.circuitPath[i + 1];
-              
-              // If we have a next point in this segment
-              if (i + 1 <= endIdx) {
-                // Calculate control points for the curve
-                const xc = (current.x + next.x) / 2;
-                const yc = (current.y + next.y) / 2;
-                
-                // Draw a quadratic curve to create rounded corners
-                ctx.quadraticCurveTo(current.x, current.y, xc, yc);
-              } else {
-                // Just draw to the last point
-                ctx.lineTo(current.x, current.y);
-              }
-            }
-            
-            // Connect to the last point in this segment
-            if (startIdx !== endIdx) {
-              ctx.lineTo(gameState.circuitPath[endIdx].x, gameState.circuitPath[endIdx].y);
-            }
-            
-            // Dark blue for visible segments
-            ctx.strokeStyle = "rgba(0, 0, 180, 0.9)";
-            ctx.lineWidth = 6;
-            ctx.stroke();
-          });
+            // Draw a quadratic curve to create rounded corners
+            ctx.quadraticCurveTo(current.x, current.y, xc, yc);
+          }
+          
+          // Connect to the last point
+          const last = gameState.circuitPath[gameState.circuitPath.length - 1];
+          ctx.lineTo(last.x, last.y);
+          
+          // Dark blue for the circuit
+          ctx.strokeStyle = "rgba(0, 0, 180, 0.9)";
+          ctx.lineWidth = 6;
+          ctx.stroke();
 
           // Draw the start point (pink circle)
           ctx.beginPath();
@@ -818,46 +921,33 @@
           drawCircuitOverlay();
         }
 
-        // Draw just the circuit overlay without clearing
+        // Draw just the circuit overlay without clearing - modified to show entire circuit
         function drawCircuitOverlay() {
-          // Draw only the visible segments of the circuit path
-          gameState.visibleSegments.forEach(segment => {
-            const startIdx = segment[0];
-            const endIdx = segment[1];
+          // Draw the entire circuit path with smooth corners
+          ctx.beginPath();
+          ctx.moveTo(gameState.circuitPath[0].x, gameState.circuitPath[0].y);
+          
+          // Use bezier curves for a smoother path
+          for (let i = 1; i < gameState.circuitPath.length - 1; i++) {
+            const current = gameState.circuitPath[i];
+            const next = gameState.circuitPath[i + 1];
             
-            // Draw this segment with smooth corners
-            ctx.beginPath();
-            ctx.moveTo(gameState.circuitPath[startIdx].x, gameState.circuitPath[startIdx].y);
+            // Calculate control points for the curve
+            const xc = (current.x + next.x) / 2;
+            const yc = (current.y + next.y) / 2;
             
-            // Use bezier curves for the points in this segment
-            for (let i = startIdx + 1; i < endIdx; i++) {
-              const current = gameState.circuitPath[i];
-              const next = gameState.circuitPath[i + 1];
-              
-              // If we have a next point in this segment
-              if (i + 1 <= endIdx) {
-                // Calculate control points for the curve
-                const xc = (current.x + next.x) / 2;
-                const yc = (current.y + next.y) / 2;
-                
-                // Draw a quadratic curve to create rounded corners
-                ctx.quadraticCurveTo(current.x, current.y, xc, yc);
-              } else {
-                // Just draw to the last point
-                ctx.lineTo(current.x, current.y);
-              }
-            }
-            
-            // Connect to the last point in this segment
-            if (startIdx !== endIdx) {
-              ctx.lineTo(gameState.circuitPath[endIdx].x, gameState.circuitPath[endIdx].y);
-            }
-            
-            // Dark blue for visible segments but more transparent
-            ctx.strokeStyle = "rgba(0, 0, 180, 0.5)";
-            ctx.lineWidth = 6;
-            ctx.stroke();
-          });
+            // Draw a quadratic curve to create rounded corners
+            ctx.quadraticCurveTo(current.x, current.y, xc, yc);
+          }
+          
+          // Connect to the last point
+          const last = gameState.circuitPath[gameState.circuitPath.length - 1];
+          ctx.lineTo(last.x, last.y);
+          
+          // Dark blue for the circuit but more transparent
+          ctx.strokeStyle = "rgba(0, 0, 180, 0.5)";
+          ctx.lineWidth = 7;
+          ctx.stroke();
         }
 
         // Interpolate between two points to add more points for smoother drawing
@@ -930,7 +1020,7 @@
           return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
         }
 
-        // Check if the user has completed the circuit
+        // Check if the user has completed the circuit - enhanced version
         function checkCompletion() {
           if (gameState.userPath.length < 10) return false; // Need a minimum path length
 
@@ -939,11 +1029,6 @@
           const dy = lastPoint.y - gameState.startPoint.y;
           const distance = Math.sqrt(dx * dx + dy * dy);
 
-          // Check if we've drawn enough path to consider completion
-          // This verifies we've made some minimum progress along the circuit
-          const minPathLength = 100; // Minimum path points to be considered a valid attempt
-          const minDistanceTraveled = canvas.width * 0.6; // Must travel at least 60% of canvas width
-          
           // Calculate total distance traveled
           let totalDistance = 0;
           for (let i = 1; i < gameState.userPath.length; i++) {
@@ -952,10 +1037,21 @@
             totalDistance += distanceBetween(prev, curr);
           }
 
-          // If we're back near the start point and have drawn enough
+          // Calculate the length of the ideal circuit path
+          let circuitLength = 0;
+          for (let i = 1; i < gameState.circuitPath.length; i++) {
+            circuitLength += distanceBetween(
+              gameState.circuitPath[i-1],
+              gameState.circuitPath[i]
+            );
+          }
+
+          // Check if we've traveled enough distance to consider a full circuit
+          const minRequiredDistance = circuitLength * 0.8; // At least 80% of circuit length
+          
+          // If we're back near the start point AND have drawn enough distance
           if (distance < gameState.completionThreshold && 
-              gameState.userPath.length >= minPathLength &&
-              totalDistance >= minDistanceTraveled) {
+              totalDistance >= minRequiredDistance) {
             calculateAccuracy();
             return true;
           }
@@ -968,14 +1064,8 @@
           // Initialize accuracy tracking variables
           gameState.accuracyPoints = 0;
           gameState.totalPossiblePoints = 0;
-          
-          // Set higher weights for visible segments
-          gameState.segmentWeights = {};
-          gameState.visibleSegments.forEach(segment => {
-            for (let i = segment[0]; i <= segment[1]; i++) {
-              gameState.segmentWeights[i] = 2.0; // Visible segments worth double
-            }
-          });
+          gameState.segmentsVisited = new Set();
+          gameState.visitedInOrder = [];
           
           // If the user path is too short, accuracy is 0
           if (gameState.userPath.length < 10) {
@@ -983,6 +1073,22 @@
             document.getElementById("accuracyResult").textContent = gameState.accuracy;
             return;
           }
+
+          // Set up checkpoint segments to ensure the entire circuit is followed
+          const checkpointSegments = [];
+          // Add some key segments as checkpoints - evenly distributed around the circuit
+          const totalSegments = gameState.circuitPath.length - 1;
+          const segmentsPerCheckpoint = Math.max(1, Math.floor(totalSegments / 8));
+          
+          for (let i = 0; i < totalSegments; i += segmentsPerCheckpoint) {
+            checkpointSegments.push(i);
+          }
+          // Ensure end segment is included
+          if (checkpointSegments[checkpointSegments.length - 1] !== totalSegments - 1) {
+            checkpointSegments.push(totalSegments - 1);
+          }
+          
+          console.log("Checkpoint segments:", checkpointSegments);
           
           // Check each point in the user path 
           // Skip some points to avoid excessive calculation
@@ -990,7 +1096,9 @@
           
           let onTrackPoints = 0;
           let totalPoints = 0;
+          let lastVisitedSegmentIndex = -1;
           
+          // First pass: Determine which segments the user's path covers
           for (let i = 0; i < gameState.userPath.length; i += samplingRate) {
             const point = gameState.userPath[i];
             totalPoints++;
@@ -1017,67 +1125,118 @@
             // Determine if the point is on track (within pathWidth of the closest segment)
             const onTrack = minDist <= gameState.pathWidth;
             
-            // If on track, add points based on segment weight
+            // If on track, add points and track segment
             if (onTrack) {
-              const weight = gameState.segmentWeights[closestSegmentIndex] || 1.0;
-              onTrackPoints += weight;
-              gameState.accuracyPoints += weight;
+              onTrackPoints++;
+              gameState.accuracyPoints++;
+              gameState.segmentsVisited.add(closestSegmentIndex);
+              
+              // Track visited segments in order (avoiding duplicates)
+              if (closestSegmentIndex !== lastVisitedSegmentIndex) {
+                gameState.visitedInOrder.push(closestSegmentIndex);
+                lastVisitedSegmentIndex = closestSegmentIndex;
+              }
             }
             
             // Add to total possible points
-            const segmentWeight = gameState.segmentWeights[closestSegmentIndex] || 1.0;
-            gameState.totalPossiblePoints += segmentWeight;
+            gameState.totalPossiblePoints++;
           }
           
-          // Calculate circuit completion percentage
-          // Check if the user completed the full circuit by verifying the user path
-          // reaches both the start and end points and covers key segments
-          let completionFactor = 1.0;
+          // Calculate path completion ratio - what percentage of segments were visited
+          const completedSegments = gameState.segmentsVisited.size;
+          const completionRatio = completedSegments / (gameState.circuitPath.length - 1);
           
-          // Check if the user hit all visible segments
-          const hitSegments = new Set();
-          for (let i = 0; i < gameState.userPath.length; i += samplingRate) {
-            const point = gameState.userPath[i];
+          console.log(`Segments covered: ${completedSegments}/${gameState.circuitPath.length - 1} (${Math.round(completionRatio * 100)}%)`);
+
+          // Check if all checkpoint segments were visited
+          let allCheckpointsVisited = true;
+          let checkpointsVisitedCount = 0;
+          for (const checkpointIndex of checkpointSegments) {
+            if (gameState.segmentsVisited.has(checkpointIndex)) {
+              checkpointsVisitedCount++;
+            } else {
+              allCheckpointsVisited = false;
+            }
+          }
+          
+          const checkpointRatio = checkpointsVisitedCount / checkpointSegments.length;
+          console.log(`Checkpoints visited: ${checkpointsVisitedCount}/${checkpointSegments.length} (${Math.round(checkpointRatio * 100)}%)`);
+          
+          // Check if segments were visited in a sensible order (sequential)
+          // This prevents high scores for random scribbling
+          let orderScore = 1.0;
+          if (gameState.visitedInOrder.length > 5) {
+            let sequentialSegments = 0;
+            let outOfOrderSegments = 0;
             
-            // Find closest segment
-            gameState.visibleSegments.forEach(segment => {
-              for (let j = segment[0]; j <= segment[1]; j++) {
-                if (j < gameState.circuitPath.length - 1) {
-                  const p1 = gameState.circuitPath[j];
-                  const p2 = gameState.circuitPath[j + 1];
-                  const closest = closestPointOnSegment(point, p1, p2);
-                  const dist = distanceBetween(point, closest);
-                  
-                  if (dist <= gameState.pathWidth * 1.5) { // Slightly more generous for segment detection
-                    hitSegments.add(j);
-                  }
-                }
+            // Check for directional consistency in the visited segments
+            for (let i = 1; i < gameState.visitedInOrder.length - 1; i++) {
+              const prev = gameState.visitedInOrder[i-1];
+              const curr = gameState.visitedInOrder[i];
+              const next = gameState.visitedInOrder[i+1];
+              
+              // Check if we're moving in a consistent direction
+              // We allow for some skipped segments but should maintain direction
+              if ((curr > prev && next >= curr) || 
+                  (curr < prev && next <= curr) ||
+                  (Math.abs(curr - prev) <= 2 && Math.abs(next - curr) <= 2)) {
+                sequentialSegments++;
+              } else {
+                outOfOrderSegments++;
               }
-            });
+            }
+            
+            const totalSegmentsChecked = sequentialSegments + outOfOrderSegments;
+            if (totalSegmentsChecked > 0) {
+              orderScore = sequentialSegments / totalSegmentsChecked;
+              orderScore = Math.max(0.3, orderScore); // Don't penalize too harshly
+            }
+            
+            console.log(`Order score: ${Math.round(orderScore * 100)}% (${sequentialSegments}/${totalSegmentsChecked} sequential)`);
           }
           
-          // Check if all visible segments were hit
-          const visibleSegmentCount = gameState.visibleSegments.reduce(
-            (count, segment) => count + (segment[1] - segment[0] + 1), 0
-          );
+          // Calculate final accuracy based on:
+          // 1. Raw accuracy (how well the user's path follows the circuit)
+          // 2. Completion ratio (what percentage of the circuit was covered)
+          // 3. Checkpoint coverage (ensuring key parts were visited)
+          // 4. Order score (ensuring the path follows a logical sequence)
           
-          // Apply completion penalty if significant segments were missed
-          const hitSegmentCount = hitSegments.size;
-          const segmentCompletionRatio = Math.min(1.0, hitSegmentCount / (visibleSegmentCount * 0.7));
-          completionFactor *= segmentCompletionRatio;
-          
-          // Calculate overall accuracy
+          // Calculate raw accuracy (how well user stayed on path)
           const rawAccuracy = gameState.accuracyPoints / Math.max(1, gameState.totalPossiblePoints);
-          gameState.accuracy = Math.round(rawAccuracy * completionFactor * 100);
+          
+          // Calculate overall circuit coverage score
+          // This heavily penalizes incomplete circuits
+          let coverageScore;
+          
+          if (gameState.fullLoopRequired) {
+            // If full loop is required, heavily weight the checkpoint coverage
+            if (checkpointRatio >= 0.8) {
+              // If most checkpoints hit, score is mostly based on precision
+              coverageScore = (checkpointRatio * 0.7) + (completionRatio * 0.3);
+            } else {
+              // If many checkpoints missed, score is mostly based on coverage
+              coverageScore = checkpointRatio * 0.9;
+            }
+          } else {
+            // If full loop not strictly required, use a more balanced approach
+            coverageScore = (checkpointRatio * 0.5) + (completionRatio * 0.5);
+          }
+          
+          // Apply a strong penalty if coverage is below minimum threshold
+          if (completionRatio < gameState.minCircuitCoverage) {
+            coverageScore *= (completionRatio / gameState.minCircuitCoverage);
+          }
+          
+          // Final accuracy calculation - weighted components
+          const finalScore = (rawAccuracy * 0.5) + (coverageScore * 0.3) + (orderScore * 0.2);
+          gameState.accuracy = Math.round(finalScore * 100);
           
           // Ensure accuracy is between 0 and 100
           gameState.accuracy = Math.max(0, Math.min(100, gameState.accuracy));
 
           // Update UI immediately
           document.getElementById("accuracyResult").textContent = gameState.accuracy;
-          console.log("Accuracy calculated: " + gameState.accuracy + "% (points: " + 
-                     gameState.accuracyPoints + "/" + gameState.totalPossiblePoints + 
-                     ", completion: " + Math.round(completionFactor * 100) + "%)");
+          console.log(`Final accuracy: ${gameState.accuracy}% (raw: ${Math.round(rawAccuracy * 100)}%, coverage: ${Math.round(coverageScore * 100)}%, order: ${Math.round(orderScore * 100)}%)`);
         }
 
         // Resample a path to have a specific number of points
@@ -1169,9 +1328,6 @@
           // Get the touch position
           const pos = getEventPosition(e);
           
-          // Remove or comment out the call to showTouchFeedback here
-          // showTouchFeedback(pos.x, pos.y);
-          
           // Update touch state
           gameState.touchActive = true;
           gameState.lastTouchTime = Date.now();
@@ -1195,6 +1351,11 @@
                 x: gameState.startPoint.x,
                 y: gameState.startPoint.y,
               };
+
+              // Reset segment tracking
+              gameState.segmentsVisited = new Set();
+              gameState.visitedInOrder = [];
+              gameState.lastCheckpointIndex = -1;
 
               // Fade out start elements
               document.getElementById("startPoint").style.opacity = "0";
@@ -1343,10 +1504,207 @@
         }
 
         // Show result screen
-        function showResultScreen() {
+         // Show result screen
+         function showResultScreen() {
           // Make sure the accuracy result is updated with the calculated value
           document.getElementById("accuracyResult").textContent = gameState.accuracy;
           document.getElementById("resultScreen").style.display = "flex";
+        }
+
+        // Generate score card image for sharing
+        function generateScoreCard() {
+          return new Promise((resolve, reject) => {
+            try {
+              // Create a canvas to draw the score card
+              const scoreCanvas = document.createElement("canvas");
+              const scoreCtx = scoreCanvas.getContext("2d");
+              
+              // Set canvas size
+              scoreCanvas.width = 320;
+              scoreCanvas.height = 240;
+              
+              // Draw background
+              scoreCtx.fillStyle = "#333";
+              scoreCtx.fillRect(0, 0, scoreCanvas.width, scoreCanvas.height);
+              
+              // Add pattern overlay
+              scoreCtx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+              scoreCtx.lineWidth = 1;
+              for (let i = 0; i < 5; i++) {
+                for (let j = 0; j < 5; j++) {
+                  scoreCtx.beginPath();
+                  scoreCtx.rect(i * 70, j * 60, 60, 50);
+                  scoreCtx.stroke();
+                }
+              }
+              
+              // Add title
+              scoreCtx.fillStyle = "white";
+              scoreCtx.font = "14px 'Noto Sans', sans-serif";
+              scoreCtx.textAlign = "center";
+              scoreCtx.fillText("フィニッシュ！", scoreCanvas.width / 2, 40);
+              
+              scoreCtx.font = "bold 24px 'Noto Sans', sans-serif";
+              scoreCtx.fillText("FINISH !", scoreCanvas.width / 2, 70);
+              
+              // Add completion label
+              scoreCtx.font = "14px 'Noto Sans', sans-serif";
+              scoreCtx.fillText("完成度", scoreCanvas.width / 2, 100);
+              
+              // Add score
+              scoreCtx.font = "bold 80px 'Noto Sans', sans-serif";
+              scoreCtx.fillStyle = "#ff6699";
+              scoreCtx.shadowColor = "#ff6699";
+              scoreCtx.shadowBlur = 15;
+              scoreCtx.fillText(gameState.accuracy, scoreCanvas.width / 2 - 20, 170);
+              
+              // Add percent sign
+              scoreCtx.font = "bold 24px 'Noto Sans', sans-serif";
+              scoreCtx.fillText("%", scoreCanvas.width / 2 + 50, 170);
+              
+              // Add game name at bottom
+              scoreCtx.shadowBlur = 0;
+              scoreCtx.fillStyle = "white";
+              scoreCtx.font = "12px 'Noto Sans', sans-serif";
+              scoreCtx.fillText("FINGER CIRCUIT", scoreCanvas.width / 2, 210);
+              
+              // Convert to data URL
+              const dataUrl = scoreCanvas.toDataURL("image/png");
+              resolve(dataUrl);
+            } catch (error) {
+              console.error("Error generating score card:", error);
+              reject(error);
+            }
+          });
+        }
+
+        // Show share modal with generated image
+        function showShareModal() {
+          // Generate the score card image
+          generateScoreCard()
+            .then(imageUrl => {
+              // Set the image in the share modal
+              document.getElementById("shareImage").src = imageUrl;
+              
+              // Show the share modal
+              document.getElementById("shareModal").style.display = "flex";
+            })
+            .catch(error => {
+              console.error("Failed to generate score card:", error);
+              alert("Failed to generate score card for sharing.");
+            });
+        }
+
+        // Share result with screenshot
+        function shareResult() {
+          // Show the share modal with platforms
+          showShareModal();
+        }
+
+        // Share to specific platform
+        function shareToSocialMedia(platform) {
+          // Get the generated image
+          const imageUrl = document.getElementById("shareImage").src;
+          
+          // Create share text
+          const shareText = `I completed the Finger Circuit with ${gameState.accuracy}% accuracy!`;
+          
+          // Share based on platform
+          switch (platform) {
+            case 'twitter':
+              // Twitter sharing
+              window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&hashtags=FingerCircuit`, '_blank');
+              break;
+            case 'facebook':
+              // Facebook sharing
+              window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${encodeURIComponent(shareText)}`, '_blank');
+              break;
+            case 'line':
+              // LINE sharing
+              window.open(`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(shareText)}`, '_blank');
+              break;
+            case 'download':
+              // Download the image
+              const link = document.createElement('a');
+              link.href = imageUrl;
+              link.download = 'finger-circuit-score.png';
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              break;
+            default:
+              // Native share if available
+              if (navigator.share) {
+                fetch(imageUrl)
+                  .then(res => res.blob())
+                  .then(blob => {
+                    const file = new File([blob], "finger-circuit-score.png", { type: "image/png" });
+                    navigator.share({
+                      title: "My Finger Circuit Result",
+                      text: shareText,
+                      files: [file]
+                    }).catch(error => {
+                      console.error("Error sharing:", error);
+                    });
+                  });
+              } else {
+                alert(`You completed the circuit with ${gameState.accuracy}% accuracy! Screenshot to share.`);
+              }
+          }
+          
+          // Close the share modal
+          document.getElementById("shareModal").style.display = "none";
+        }
+
+        // Return to map
+        function returnToMap() {
+          // Navigate to map page or show map view
+          window.location.href = "index.html"; // Or any other map page
+        }
+
+        // Reset game
+        function resetGame() {
+          // Reset game state
+          gameState.status = "initializing";
+          gameState.userPath = [];
+          gameState.isDrawing = false;
+
+          // Reset UI
+          document.getElementById("resultScreen").style.display = "none";
+          document.getElementById("startPoint").style.opacity = "1";
+          document.getElementById("startArrow").style.opacity = "1";
+
+          // Clear canvas and redraw
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          drawCircuit();
+
+          // Show white belt and mission banner again
+          const whiteBelt = document.getElementById("whiteBelt");
+          const missionBanner = document.querySelector(".mission-banner");
+
+          whiteBelt.style.display = "flex";
+          whiteBelt.style.opacity = "1";
+          missionBanner.style.display = "block";
+          missionBanner.style.opacity = "1";
+
+          // Direct timeout without nesting
+          setTimeout(function () {
+            whiteBelt.style.opacity = "0";
+            setTimeout(function () {
+              whiteBelt.style.display = "none";
+              missionBanner.style.opacity = "0";
+              setTimeout(function () {
+                missionBanner.style.display = "none";
+                gameState.status = "ready";
+
+                // Force redraw after ready state
+                drawCircuit();
+                
+                // Show start tooltip again
+                showStartTooltip();
+              }, 500);
+            }, 500);
+          }, 2000);
         }
 
         // Initialize the game
@@ -1420,108 +1778,24 @@
             document
               .getElementById("mapButton")
               .addEventListener("click", returnToMap);
+              
+            // Add share platform listeners
+            document.querySelectorAll(".share-platform").forEach(element => {
+              element.addEventListener("click", function() {
+                const platform = this.getAttribute("data-platform");
+                shareToSocialMedia(platform);
+              });
+            });
+            
+            // Add close share modal listener
+            document
+              .getElementById("closeShare")
+              .addEventListener("click", function() {
+                document.getElementById("shareModal").style.display = "none";
+              });
           } catch (error) {
             console.error("Error during game initialization:", error);
           }
-        }
-
-        // Reset game
-        function resetGame() {
-          // Reset game state
-          gameState.status = "initializing";
-          gameState.userPath = [];
-          gameState.isDrawing = false;
-
-          // Reset UI
-          document.getElementById("resultScreen").style.display = "none";
-          document.getElementById("startPoint").style.opacity = "1";
-          document.getElementById("startArrow").style.opacity = "1";
-
-          // Clear canvas and redraw
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-          drawCircuit();
-
-          // Show white belt and mission banner again
-          const whiteBelt = document.getElementById("whiteBelt");
-          const missionBanner = document.querySelector(".mission-banner");
-
-          whiteBelt.style.display = "flex";
-          whiteBelt.style.opacity = "1";
-          missionBanner.style.display = "block";
-          missionBanner.style.opacity = "1";
-
-          // Direct timeout without nesting
-          setTimeout(function () {
-            whiteBelt.style.opacity = "0";
-            setTimeout(function () {
-              whiteBelt.style.display = "none";
-              missionBanner.style.opacity = "0";
-              setTimeout(function () {
-                missionBanner.style.display = "none";
-                gameState.status = "ready";
-
-                // Force redraw after ready state
-                drawCircuit();
-                
-                // Show start tooltip again
-                showStartTooltip();
-              }, 500);
-            }, 500);
-          }, 2000);
-        }
-
-        // Share result with screenshot
-        function shareResult() {
-          // Take a screenshot of the result modal
-          const resultModal = document.querySelector(".result-modal");
-          
-          // Create a canvas to draw the screenshot
-          const screenshotCanvas = document.createElement("canvas");
-          const screenshotCtx = screenshotCanvas.getContext("2d");
-          
-          // Set canvas size to match the modal
-          screenshotCanvas.width = resultModal.offsetWidth;
-          screenshotCanvas.height = resultModal.offsetHeight;
-          
-          // Use html2canvas if available, otherwise use a fallback message
-          if (typeof html2canvas !== "undefined") {
-            html2canvas(resultModal).then(canvas => {
-              // Convert to data URL
-              const imageData = canvas.toDataURL("image/png");
-              
-              // Share the image if Web Share API is available
-              if (navigator.share) {
-                fetch(imageData)
-                  .then(res => res.blob())
-                  .then(blob => {
-                    const file = new File([blob], "finger-circuit-score.png", { type: "image/png" });
-                    navigator.share({
-                      title: "My Finger Circuit Result",
-                      text: `I completed the Finger Circuit with ${gameState.accuracy}% accuracy!`,
-                      files: [file]
-                    }).catch(error => {
-                      console.error("Error sharing:", error);
-                      fallbackShare();
-                    });
-                  });
-              } else {
-                fallbackShare();
-              }
-            });
-          } else {
-            fallbackShare();
-          }
-          
-          // Fallback sharing method
-          function fallbackShare() {
-            alert(`You completed the circuit with ${gameState.accuracy}% accuracy! Screenshot to share.`);
-          }
-        }
-
-        // Return to map
-        function returnToMap() {
-          // Navigate to map page or show map view
-          window.location.href = "index.html"; // Or any other map page
         }
 
         // Start the game
