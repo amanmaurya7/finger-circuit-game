@@ -613,331 +613,417 @@
       document.addEventListener("DOMContentLoaded", function () {
         // Get canvas and context
         const canvas = document.getElementById("gameCanvas");
-        const ctx = canvas.getContext("2d");
-        const touchIndicator = document.getElementById("touchIndicator");
+const ctx = canvas.getContext("2d");
+const touchIndicator = document.getElementById("touchIndicator");
 
-        // Game state and variables
-        const gameState = {
-          status: "initializing", // initializing, ready, playing, completed
-          difficulty: "beginner",
-          userPath: [],
-          lastPoint: null,
-          isDrawing: false,
-          startPoint: { x: 0, y: 0 }, // Will be set properly in initializeCircuitPath
-          startRadius: 8, // Reduced for better precision
-          circuitPath: [],
-          completionThreshold: 20, // Distance to consider the circuit completed when returning to start
-          accuracy: 0,
-          minDrawDistance: 1, // IMPROVED: Reduced for better sensitivity (was 2)
-          interpolationPoints: 5, // IMPROVED: Increased for smoother curves (was 2)
-          pathWidth: 15, // Width of the circuit path for accuracy calculation
-          redrawScheduled: false,
-          touchActive: false, // Track if touch is active for better responsiveness
-          lastTouchTime: 0, // Track last touch time for better responsiveness
-          
-          // Add path progression tracking for better accuracy calculation
-          pathProgression: 0,          // Current progress along the circuit path (0-100%)
-          lastSegmentIndex: 0,         // Last closest segment for path progression
-          accuracyPoints: 0,           // Points earned for accuracy
-          totalPossiblePoints: 0,      // Total possible accuracy points
-          segmentsVisited: new Set(),  // Track which segments the user has visited
-          visitedInOrder: [],          // Track segments visited in order
-          minCircuitCoverage: 0.7,     // Minimum percentage of circuit that must be covered
-          fullLoopRequired: true,      // Require a full loop for high accuracy
-          lastCheckpointIndex: -1      // Last checkpoint segment index reached
-        };
+// Game state and variables
+const gameState = {
+  status: "initializing", // initializing, ready, playing, completed
+  difficulty: "beginner",
+  userPath: [],
+  lastPoint: null,
+  isDrawing: false,
+  startPoint: { x: 0, y: 0 }, // Will be set properly in initializeCircuitPath
+  startRadius: 8, // Reduced for better precision
+  circuitPath: [],
+  completionThreshold: 20, // Distance to consider the circuit completed when returning to start
+  accuracy: 0,
+  minDrawDistance: 1, // IMPROVED: Reduced for better sensitivity (was 2)
+  interpolationPoints: 5, // IMPROVED: Increased for smoother curves (was 2)
+  pathWidth: 15, // Width of the circuit path for accuracy calculation
+  redrawScheduled: false,
+  touchActive: false, // Track if touch is active for better responsiveness
+  lastTouchTime: 0, // Track last touch time for better responsiveness
+  
+  // Add path progression tracking for better accuracy calculation
+  pathProgression: 0,          // Current progress along the circuit path (0-100%)
+  lastSegmentIndex: 0,         // Last closest segment for path progression
+  accuracyPoints: 0,           // Points earned for accuracy
+  totalPossiblePoints: 0,      // Total possible accuracy points
+  segmentsVisited: new Set(),  // Track which segments the user has visited
+  visitedInOrder: [],          // Track segments visited in order
+  minCircuitCoverage: 0.7,     // Minimum percentage of circuit that must be covered
+  fullLoopRequired: true,      // Require a full loop for high accuracy
+  lastCheckpointIndex: -1      // Last checkpoint segment index reached
+};
 
-        // Set canvas size
-        function resizeCanvas() {
-          // Get the container dimensions
-          const container = canvas.parentElement;
+// Set canvas size
+function resizeCanvas() {
+  // Get the container dimensions
+  const container = canvas.parentElement;
 
-          // Calculate the available width and height
-          const availableWidth = Math.min(window.innerWidth, 800); // Cap at max-width
+  // Calculate the available width and height
+  const availableWidth = Math.min(window.innerWidth, 800); // Cap at max-width
 
-          // Maintain the aspect ratio of 350:500 (from the original design)
-          const aspectRatio = 350 / 500;
+  // Maintain the aspect ratio of 350:500 (from the original design)
+  const aspectRatio = 350 / 500;
 
-          // Set canvas dimensions based on available width and maintaining aspect ratio
-          canvas.width = availableWidth;
-          canvas.height = availableWidth / aspectRatio;
+  // Set canvas dimensions based on available width and maintaining aspect ratio
+  canvas.width = availableWidth;
+  canvas.height = availableWidth / aspectRatio;
 
-          // Make sure the canvas height doesn't exceed the available height
-          const maxHeight = window.innerHeight * 0.7;
-          if (canvas.height > maxHeight) {
-            canvas.height = maxHeight;
-            canvas.width = maxHeight * aspectRatio;
-          }
+  // Make sure the canvas height doesn't exceed the available height
+  const maxHeight = window.innerHeight * 0.7;
+  if (canvas.height > maxHeight) {
+    canvas.height = maxHeight;
+    canvas.width = maxHeight * aspectRatio;
+  }
 
-          // Re-initialize circuit path after resize
-          initializeCircuitPath();
+  // Re-initialize circuit path after resize
+  initializeCircuitPath();
 
-          // Re-draw everything after resize
-          if (gameState.status === "playing" || gameState.status === "ready") {
-            drawCircuit();
-            if (gameState.userPath.length > 0) {
-              drawUserPath();
-            }
-          }
+  // Re-draw everything after resize
+  if (gameState.status === "playing" || gameState.status === "ready") {
+    drawCircuit();
+    if (gameState.userPath.length > 0) {
+      drawUserPath();
+    }
+  }
 
-          console.log("Canvas resized to:", canvas.width, "x", canvas.height);
-        }
+  console.log("Canvas resized to:", canvas.width, "x", canvas.height);
+}
 
-        window.addEventListener("resize", resizeCanvas);
+window.addEventListener("resize", resizeCanvas);
 
-        // Create circuit path
-        function initializeCircuitPath() {
-          // Define the base coordinates for a 350x500 canvas
-          // These are the fixed coordinates that will be scaled to any screen size
-          const baseCoordinates = [
-            // Start point
-            { x: 73, y: 150 },
+// Create circuit path
+function initializeCircuitPath() {
+  // Define the base coordinates for a 350x500 canvas
+  // These are the fixed coordinates that will be scaled to any screen size
+  // Updated visibility to match the image: 
+  // 2 = fully visible (dark blue)
+  // 1 = partially visible (light blue) 
+  // 0 = hidden
+  const baseCoordinates = [
+    // Start point - vertical line at top (dark blue)
+    { x: 73, y: 150, visible: 2 },
+    { x: 75, y: 80, visible: 2 },
+    { x: 75, y: 50, visible: 2 },
 
-            // Vertical line up
-            { x: 75, y: 80 },
-            { x: 75, y: 50 },
+    // Top loop - S curve in upper section (dark blue)
+    { x: 100, y: 38, visible: 0 },
+    { x: 115, y: 60, visible: 0 },
+    { x: 110, y: 95, visible: 2 },
+    { x: 100, y: 110, visible: 2 },
+    { x: 125, y: 120, visible: 2 }, // Start of visible curve
+    { x: 100, y: 150, visible: 2 },
+    { x: 115, y: 155, visible: 2 },
 
-            // Top loop
-            { x: 100, y: 38 },
-            { x: 115, y: 60 },
-            { x: 110, y: 95 },
-            { x: 100, y: 110 },
-            { x: 125, y: 120 },
-            { x: 100, y: 150 },
-            { x: 115, y: 155 },
+    // Middle section - horizontal segments (dark blue)
+    { x: 130, y: 180, visible: 0 },
+    { x: 90, y: 200, visible: 0 },
+    { x: 90, y: 220, visible: 2 }, // Start of visible horizontal segment
+    { x: 110, y: 240, visible: 2 },
+    { x: 140, y: 230, visible: 2 },
+    { x: 150, y: 250, visible: 2 },
+    { x: 190, y: 240, visible: 2 }, // End of visible horizontal segment
+    { x: 180, y: 300, visible: 0 },
+    { x: 135, y: 340, visible: 0 },
 
-            // S-curve section
-            // { x: 120, y: 135 },
-            { x: 130, y: 180 },
-            { x: 90, y: 200 },
-            { x: 90, y: 220 },
-            { x: 110, y: 240 },
-            { x: 140, y: 230 },
-            { x: 150, y: 250 },
-            { x: 205, y: 230 },
-            { x: 180, y: 300 },
-            { x: 135, y: 340 }, // 1
+    // Horizontal middle section
+    { x: 200, y: 320, visible: 0 },
 
-            // Horizontal middle section
-            { x: 200, y: 320 },
-            // { x: 245, y: 360 },
+    // Right curve down - partially visible (light blue)
+    { x: 245, y: 400, visible: 1 },
+    { x: 230, y: 430, visible: 1 },
 
-            // Right curve down
-            { x: 265, y: 390 },
-            { x: 220, y: 430 },
+    // Bottom large loop - partially visible (light blue)
+    { x: 270, y: 480, visible: 1 },
+    { x: 270, y: 400, visible: 1 },
+    { x: 240, y: 350, visible: 1 },
 
-            // Bottom large loop
-            { x: 270, y: 480 },
-            { x: 270, y: 400 },
-            { x: 240, y: 300 },
-            // { x: 190, y: 325 },
+    // Return path - invisible
+    { x: 200, y: 320, visible: 0 },
+    { x: 180, y: 260, visible: 2 },
+    {x: 120, y: 260, visible: 2},
+    { x: 80, y: 240, visible: 2 },
+    { x: 73, y: 150, visible: 0 },
+    { x: 180, y: 270, visible: 0 },
+    { x: 73, y: 250, visible: 0 },
+    { x: 73, y: 150, visible: 0 },
+  ];
 
-            // Return path
-            // { x: 200, y: 310 }, // 1
-            // { x: 200, y: 300 },
-            { x: 200, y: 300 },
-            // { x: 90, y: 285 },
-            { x: 180, y: 270 },
-            { x: 73, y: 250 },
-            { x: 73, y: 150 },
-          ];
+  // Calculate the scale factors based on current canvas size
+  const scaleX = canvas.width / 350;
+  const scaleY = canvas.height / 500;
 
-          // Calculate the scale factors based on current canvas size
-          const scaleX = canvas.width / 350;
-          const scaleY = canvas.height / 500;
+  // Set the start point
+  gameState.startPoint = {
+    x: baseCoordinates[0].x * scaleX,
+    y: baseCoordinates[0].y * scaleY,
+  };
 
-          // Set the start point
-          gameState.startPoint = {
-            x: baseCoordinates[0].x * scaleX,
-            y: baseCoordinates[0].y * scaleY,
-          };
+  // Scale all the coordinates to the current canvas size
+  gameState.circuitPath = baseCoordinates.map((point) => ({
+    x: point.x * scaleX,
+    y: point.y * scaleY,
+    visible: point.visible // Preserve visibility property
+  }));
 
-          // Scale all the coordinates to the current canvas size
-          gameState.circuitPath = baseCoordinates.map((point) => ({
-            x: point.x * scaleX,
-            y: point.y * scaleY,
-          }));
+  // Position the start UI elements
+  positionStartElements();
 
-          // Position the start UI elements
-          positionStartElements();
+  // Force redraw
+  drawCircuit();
+  console.log(
+    "Circuit drawn at:",
+    gameState.startPoint,
+    "with scale factors:",
+    scaleX,
+    scaleY
+  );
+}
 
-          // Force redraw
-          drawCircuit();
-          console.log(
-            "Circuit drawn at:",
-            gameState.startPoint,
-            "with scale factors:",
-            scaleX,
-            scaleY
-          );
-        }
+// Position the start point and arrow UI elements
+function positionStartElements() {
+  const startPointElem = document.getElementById("startPoint");
+  const startArrowElem = document.getElementById("startArrow");
 
-        // Position the start point and arrow UI elements
-        function positionStartElements() {
-          const startPointElem = document.getElementById("startPoint");
-          const startArrowElem = document.getElementById("startArrow");
+  startPointElem.style.left = `${gameState.startPoint.x - 50}px`;
+  startPointElem.style.top = `${gameState.startPoint.y + 150}px`;
 
-          startPointElem.style.left = `${gameState.startPoint.x - 50}px`;
-          startPointElem.style.top = `${gameState.startPoint.y + 150}px`;
+  startArrowElem.style.left = `${gameState.startPoint.x - 25}px`;
+  startArrowElem.style.top = `${gameState.startPoint.y + 60}px`;
+}
 
-          startArrowElem.style.left = `${gameState.startPoint.x - 25}px`;
-          startArrowElem.style.top = `${gameState.startPoint.y + 60}px`;
-        }
+// Show start tooltip
+function showStartTooltip() {
+  const tooltip = document.createElement("div");
+  tooltip.className = "start-tooltip";
+  tooltip.textContent = "";
+  tooltip.style.left = `${gameState.startPoint.x - 100}px`;
+  tooltip.style.top = `${gameState.startPoint.y + 100}px`;
+  document.body.appendChild(tooltip);
+  
+  // Remove tooltip after 5 seconds or when game starts
+  setTimeout(() => {
+    if (document.body.contains(tooltip)) {
+      document.body.removeChild(tooltip);
+    }
+  }, 5000);
+  
+  // Store reference to remove it when game starts
+  gameState.startTooltip = tooltip;
+}
 
-        // Show start tooltip
-        function showStartTooltip() {
-          const tooltip = document.createElement("div");
-          tooltip.className = "start-tooltip";
-          tooltip.textContent = "";
-          tooltip.style.left = `${gameState.startPoint.x - 100}px`;
-          tooltip.style.top = `${gameState.startPoint.y + 100}px`;
-          document.body.appendChild(tooltip);
-          
-          // Remove tooltip after 5 seconds or when game starts
-          setTimeout(() => {
-            if (document.body.contains(tooltip)) {
-              document.body.removeChild(tooltip);
-            }
-          }, 5000);
-          
-          // Store reference to remove it when game starts
-          gameState.startTooltip = tooltip;
-        }
+// Draw the circuit guidelines - modified to show only visible parts of the circuit
+function drawCircuit() {
+  // Clear the entire canvas to keep the map visible
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // Draw the circuit guidelines - modified to show the entire circuit
-        function drawCircuit() {
-          // Clear the entire canvas to keep the map visible
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
+  // Draw fully visible segments (dark blue)
+  drawCircuitSegments(2, "rgba(0, 0, 180, 0.9)", 6);
+  
+  // Draw partially visible segments (light blue)
+  drawCircuitSegments(1, "rgba(100, 100, 255, 0.7)", 5);
 
-          // Draw the entire circuit path with smooth corners
-          ctx.beginPath();
-          ctx.moveTo(gameState.circuitPath[0].x, gameState.circuitPath[0].y);
-          
-          // Use bezier curves for a smoother path
-          for (let i = 1; i < gameState.circuitPath.length - 1; i++) {
-            const current = gameState.circuitPath[i];
-            const next = gameState.circuitPath[i + 1];
-            
-            // Calculate control points for the curve
-            const xc = (current.x + next.x) / 2;
-            const yc = (current.y + next.y) / 2;
-            
-            // Draw a quadratic curve to create rounded corners
-            ctx.quadraticCurveTo(current.x, current.y, xc, yc);
-          }
-          
-          // Connect to the last point
-          const last = gameState.circuitPath[gameState.circuitPath.length - 1];
-          ctx.lineTo(last.x, last.y);
-          
-          // Dark blue for the circuit
-          ctx.strokeStyle = "rgba(0, 0, 180, 0.9)";
-          ctx.lineWidth = 6;
-          ctx.stroke();
+  // Draw the start point (pink circle)
+  ctx.beginPath();
+  ctx.arc(
+    gameState.startPoint.x,
+    gameState.startPoint.y,
+    gameState.startRadius,
+    0,
+    Math.PI * 2
+  );
+  ctx.fillStyle = "#ff6699";
+  ctx.fill();
 
-          // Draw the start point (pink circle)
-          ctx.beginPath();
-          ctx.arc(
-            gameState.startPoint.x,
-            gameState.startPoint.y,
-            gameState.startRadius,
-            0,
-            Math.PI * 2
-          );
-          ctx.fillStyle = "#ff6699";
-          ctx.fill();
+  // Add a pulsing effect to the start point
+  if (gameState.status === "ready") {
+    // Draw outer circle with animation - smaller pulse size
+    const pulseSize =
+      gameState.startRadius * 1.5 + Math.sin(Date.now() / 200) * 3;
+    ctx.beginPath();
+    ctx.arc(
+      gameState.startPoint.x,
+      gameState.startPoint.y,
+      pulseSize,
+      0,
+      Math.PI * 2
+    );
+    ctx.strokeStyle = "#ff6699";
+    ctx.lineWidth = 2;
+    ctx.stroke();
 
-          // Add a pulsing effect to the start point
-          if (gameState.status === "ready") {
-            // Draw outer circle with animation - smaller pulse size
-            const pulseSize =
-              gameState.startRadius * 1.5 + Math.sin(Date.now() / 200) * 3;
-            ctx.beginPath();
-            ctx.arc(
-              gameState.startPoint.x,
-              gameState.startPoint.y,
-              pulseSize,
-              0,
-              Math.PI * 2
-            );
-            ctx.strokeStyle = "#ff6699";
-            ctx.lineWidth = 2;
-            ctx.stroke();
+    // Request animation frame to keep pulsing
+    if (gameState.status === "ready") {
+      requestAnimationFrame(drawCircuit);
+    }
+  }
+}
 
-            // Request animation frame to keep pulsing
-            if (gameState.status === "ready") {
-              requestAnimationFrame(drawCircuit);
-            }
-          }
-        }
+// Draw circuit segments with specified visibility level
+function drawCircuitSegments(visibilityLevel, strokeStyle, lineWidth) {
+  // Find segments with the specified visibility level
+  let segments = [];
+  let currentSegment = [];
+  
+  for (let i = 0; i < gameState.circuitPath.length; i++) {
+    const point = gameState.circuitPath[i];
+    
+    if (point.visible === visibilityLevel) {
+      currentSegment.push(point);
+    } else if (currentSegment.length > 0) {
+      // End of a segment, save it if it has at least 2 points
+      if (currentSegment.length >= 2) {
+        segments.push([...currentSegment]);
+      }
+      currentSegment = [];
+    }
+  }
+  
+  // Don't forget the last segment
+  if (currentSegment.length >= 2) {
+    segments.push(currentSegment);
+  }
+  
+  // Draw each segment with smooth curves
+  segments.forEach(segment => {
+    if (segment.length < 2) return;
+    
+    ctx.beginPath();
+    ctx.moveTo(segment[0].x, segment[0].y);
+    
+    // Draw curves between points
+    for (let i = 1; i < segment.length - 1; i++) {
+      const current = segment[i];
+      const next = segment[i + 1];
+      
+      // Calculate midpoint for quadratic curve
+      const xc = (current.x + next.x) / 2;
+      const yc = (current.y + next.y) / 2;
+      
+      // Draw a quadratic curve
+      ctx.quadraticCurveTo(current.x, current.y, xc, yc);
+    }
+    
+    // Connect to the last point
+    if (segment.length > 1) {
+      ctx.lineTo(segment[segment.length - 1].x, segment[segment.length - 1].y);
+    }
+    
+    // Set appearance
+    ctx.strokeStyle = strokeStyle;
+    ctx.lineWidth = lineWidth;
+    ctx.stroke();
+  });
+}
 
-        // Draw the user's path
-        function drawUserPath() {
-          if (gameState.userPath.length < 2) return;
+// Draw the user's path
+function drawUserPath() {
+  if (gameState.userPath.length < 2) return;
 
-          ctx.beginPath();
-          ctx.moveTo(gameState.userPath[0].x, gameState.userPath[0].y);
+  ctx.beginPath();
+  ctx.moveTo(gameState.userPath[0].x, gameState.userPath[0].y);
 
-          // Use smooth curves for the user's path too
-          for (let i = 1; i < gameState.userPath.length - 1; i++) {
-            const current = gameState.userPath[i];
-            const next = gameState.userPath[i + 1];
+  // Use smooth curves for the user's path too
+  for (let i = 1; i < gameState.userPath.length - 1; i++) {
+    const current = gameState.userPath[i];
+    const next = gameState.userPath[i + 1];
 
-            // Calculate midpoint
-            const xc = (current.x + next.x) / 2;
-            const yc = (current.y + next.y) / 2;
+    // Calculate midpoint
+    const xc = (current.x + next.x) / 2;
+    const yc = (current.y + next.y) / 2;
 
-            // Draw a quadratic curve
-            ctx.quadraticCurveTo(current.x, current.y, xc, yc);
-          }
+    // Draw a quadratic curve
+    ctx.quadraticCurveTo(current.x, current.y, xc, yc);
+  }
 
-          // Connect to the last point if there are enough points
-          if (gameState.userPath.length > 1) {
-            const last = gameState.userPath[gameState.userPath.length - 1];
-            ctx.lineTo(last.x, last.y);
-          }
+  // Connect to the last point if there are enough points
+  if (gameState.userPath.length > 1) {
+    const last = gameState.userPath[gameState.userPath.length - 1];
+    ctx.lineTo(last.x, last.y);
+  }
 
-          // IMPROVED: More visible user path
-          ctx.strokeStyle = "rgba(255, 0, 0, 0.9)"; // Brighter red
-          ctx.lineWidth = 5;
-          ctx.lineCap = "round"; // Add rounded ends to the line
-          ctx.lineJoin = "round"; // Add rounded corners
-          ctx.stroke();
+  // IMPROVED: More visible user path
+  ctx.strokeStyle = "rgba(255, 0, 0, 0.9)"; // Brighter red
+  ctx.lineWidth = 5;
+  ctx.lineCap = "round"; // Add rounded ends to the line
+  ctx.lineJoin = "round"; // Add rounded corners
+  ctx.stroke();
 
-          // After drawing the user path, redraw the circuit guidelines
-          // so they remain visible underneath - lighter shade
-          drawCircuitOverlay();
-        }
+  // After drawing the user path, redraw the circuit guidelines
+  // so they remain visible underneath - lighter shade
+  drawCircuitOverlay();
+}
 
-        // Draw just the circuit overlay without clearing - modified to show entire circuit
-        function drawCircuitOverlay() {
-          // Draw the entire circuit path with smooth corners
-          ctx.beginPath();
-          ctx.moveTo(gameState.circuitPath[0].x, gameState.circuitPath[0].y);
-          
-          // Use bezier curves for a smoother path
-          for (let i = 1; i < gameState.circuitPath.length - 1; i++) {
-            const current = gameState.circuitPath[i];
-            const next = gameState.circuitPath[i + 1];
-            
-            // Calculate control points for the curve
-            const xc = (current.x + next.x) / 2;
-            const yc = (current.y + next.y) / 2;
-            
-            // Draw a quadratic curve to create rounded corners
-            ctx.quadraticCurveTo(current.x, current.y, xc, yc);
-          }
-          
-          // Connect to the last point
-          const last = gameState.circuitPath[gameState.circuitPath.length - 1];
-          ctx.lineTo(last.x, last.y);
-          
-          // Dark blue for the circuit but more transparent
-          ctx.strokeStyle = "rgba(0, 0, 180, 0.5)";
-          ctx.lineWidth = 7;
-          ctx.stroke();
-        }
+// Draw just the circuit overlay without clearing
+function drawCircuitOverlay() {
+  // Draw fully visible segments with lighter transparency
+  drawCircuitSegments(2, "rgba(0, 0, 180, 0.5)", 7);
+  
+  // Draw partially visible segments with lighter transparency
+  drawCircuitSegments(1, "rgba(100, 100, 255, 0.4)", 6);
+}
 
+// Function to set coordinate visibility 
+// (0 = hidden, 1 = partially visible, 2 = fully visible)
+function setCoordinateVisibility(index, visibilityLevel) {
+  if (index >= 0 && index < gameState.circuitPath.length) {
+    gameState.circuitPath[index].visible = visibilityLevel;
+    // Redraw the circuit to reflect the changes
+    drawCircuit();
+    if (gameState.userPath.length > 0) {
+      drawUserPath();
+    }
+  }
+}
+
+// Function to toggle visibility of a coordinate
+function toggleCoordinateVisibility(index) {
+  if (index >= 0 && index < gameState.circuitPath.length) {
+    // Cycle through visibility levels: 0 -> 1 -> 2 -> 0
+    gameState.circuitPath[index].visible = (gameState.circuitPath[index].visible + 1) % 3;
+    // Redraw the circuit to reflect the changes
+    drawCircuit();
+    if (gameState.userPath.length > 0) {
+      drawUserPath();
+    }
+  }
+}
+
+// Function to set visibility for multiple coordinates at once
+function setMultipleCoordinatesVisibility(indices, visibilityLevel) {
+  indices.forEach(index => {
+    if (index >= 0 && index < gameState.circuitPath.length) {
+      gameState.circuitPath[index].visible = visibilityLevel;
+    }
+  });
+  
+  // Redraw the circuit to reflect the changes
+  drawCircuit();
+  if (gameState.userPath.length > 0) {
+    drawUserPath();
+  }
+}
+
+// Function to set visibility for a segment of the path
+function setPathSegmentVisibility(startIndex, endIndex, visibilityLevel) {
+  if (startIndex >= 0 && 
+      endIndex >= startIndex && 
+      endIndex < gameState.circuitPath.length) {
+    
+    for (let i = startIndex; i <= endIndex; i++) {
+      gameState.circuitPath[i].visible = visibilityLevel;
+    }
+    
+    // Redraw the circuit to reflect the changes
+    drawCircuit();
+    if (gameState.userPath.length > 0) {
+      drawUserPath();
+    }
+  }
+}
+
+// Function to get all coordinates with their visibility status
+function getCircuitPathWithVisibility() {
+  return gameState.circuitPath.map((point, index) => ({
+    index,
+    x: point.x,
+    y: point.y,
+    visible: point.visible
+  }));
+}
         // Interpolate between two points to add more points for smoother drawing
         function interpolatePoints(p1, p2, numPoints) {
           const points = [];
