@@ -795,10 +795,10 @@
               ctx.lineTo(last.x, last.y);
             }
 
-            ctx.strokeStyle = "rgba(255, 0, 0, 0.9)";
-            ctx.lineWidth = 5;
-            ctx.lineCap = "round";
-            ctx.lineJoin = "round";
+            ctx.strokeStyle = "rgba(0, 0, 180, 0.9)"; // blue
+            ctx.lineWidth = 3;
+            ctx.lineCap = "round"; // Add rounded ends to the line
+            ctx.lineJoin = "round"; // Add rounded corners
             ctx.stroke();
 
             drawCircuitOverlay();

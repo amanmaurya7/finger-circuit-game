@@ -702,25 +702,27 @@ function initializeCircuitPath() {
     // Top loop - S curve in upper section (dark blue)
     { x: 100, y: 38, visible: 0 },
     { x: 115, y: 60, visible: 0 },
-    { x: 110, y: 95, visible: 2 },
+    { x: 110, y: 95, visible: 0 },
     { x: 100, y: 110, visible: 2 },
     { x: 125, y: 120, visible: 2 }, // Start of visible curve
     { x: 100, y: 150, visible: 2 },
     { x: 115, y: 155, visible: 2 },
 
     // Middle section - horizontal segments (dark blue)
-    { x: 130, y: 180, visible: 0 },
-    { x: 90, y: 200, visible: 0 },
-    { x: 90, y: 220, visible: 0 }, // Start of visible horizontal segment
+    { x: 130, y: 180, visible: 2 },
+    { x: 90,  y: 200, visible: 0 },
+    { x: 90,  y: 220, visible: 0 }, // Start of visible horizontal segment
     { x: 110, y: 240, visible: 2 },
     { x: 140, y: 230, visible: 2 },
     { x: 150, y: 250, visible: 2 },
     { x: 190, y: 240, visible: 2 }, // End of visible horizontal segment
-    { x: 180, y: 300, visible: 0 },
-    { x: 160, y: 320, visible: 0 },
+    { x: 170, y: 220, visible: 0 },
+    { x: 190, y: 280, visible: 2 },
+    { x: 180, y: 300, visible: 2 },
+    { x: 140, y: 335, visible: 2 },
 
     // Horizontal middle section
-    { x: 200, y: 320, visible: 0 },
+    { x: 190, y: 320, visible: 2 },
 
     // Right curve down - partially visible (light blue)
     { x: 245, y: 400, visible: 1 },
@@ -936,8 +938,8 @@ function drawUserPath() {
   }
 
   // IMPROVED: More visible user path
-  ctx.strokeStyle = "rgba(255, 0, 0, 0.9)"; // Brighter red
-  ctx.lineWidth = 5;
+  ctx.strokeStyle = "rgba(0, 0, 180, 0.9)"; // blue
+  ctx.lineWidth = 3;
   ctx.lineCap = "round"; // Add rounded ends to the line
   ctx.lineJoin = "round"; // Add rounded corners
   ctx.stroke();
