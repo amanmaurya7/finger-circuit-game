@@ -354,65 +354,86 @@
         width: 90%;
         max-width: 350px;
         background-color: white;
-        border-radius: 12px;
-        padding: 20px;
+        border-radius: 30px;
+        padding: 25px;
         display: flex;
         flex-direction: column;
         align-items: center;
+        position: relative;
       }
 
       .share-title {
-        font-size: 18px;
-        margin-bottom: 15px;
+        font-size: 20px;
+        margin-bottom: 20px;
         text-align: center;
       }
 
       .share-image {
         width: 100%;
         max-width: 300px;
-        margin-bottom: 15px;
-        border-radius: 8px;
+        margin-bottom: 20px;
+        border-radius: 10px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border: 1px solid #eee;
       }
-
-      .share-buttons {
-        display: flex;
-        justify-content: space-around;
-        width: 100%;
-        margin-top: 10px;
-      }
-
-      .share-platform {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 10px;
-        cursor: pointer;
-      }
-
-      .share-platform-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-bottom: 5px;
-      }
-
-      .share-platform-name {
-        font-size: 12px;
-      }
+      
+      /* Removed share-buttons, share-platform, and share-platform-icon styles */
 
       .close-share {
         position: absolute;
-        top: 10px;
-        right: 10px;
+        top: 15px;
+        right: 15px;
         background: none;
         border: none;
         font-size: 24px;
         cursor: pointer;
+        color: #333;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+      }
+
+      .close-share:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+      }
+      
+      /* Update universal share button styling to be more prominent */
+      .universal-share-button {
+        width: 60px;
+        height: 60px;
+        background-color: #2196F3;
         color: white;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 10px;
+        box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+        transition: background-color 0.3s, transform 0.1s;
+      }
+      
+      .universal-share-button:hover {
+        background-color: #0d8aee;
+      }
+      
+      .universal-share-button:active {
+        transform: scale(0.95);
+      }
+
+      .share-icon {
+        width: 24px;
+        height: 24px;
+      }
+
+      .share-loading {
+        color: #666;
+        font-size: 14px;
+        margin: 20px 0;
       }
 
       @keyframes pulse {
@@ -528,86 +549,40 @@
 
        <!-- Social Share Modal -->
        <div id="shareModal" class="share-modal">
-        <button id="closeShare" class="close-share">×</button>
         <div class="share-content">
-          <div class="share-title">スコアをシェアする</div>
+          <button id="closeShare" class="close-share">×</button>
+          <div class="share-title">Share Your Score !!!</div>
           <img id="shareImage" class="share-image" alt="Your score" />
-          <div class="share-buttons">
-            <div class="share-platform" data-platform="twitter">
-              <div class="share-platform-icon" style="background-color: #1DA1F2;">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-                  <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
-                </svg>
-              </div>
-              <div class="share-platform-name">Twitter</div>
-            </div>
-            <div class="share-platform" data-platform="instagram">
-              <div class="share-platform-icon" style="background-color: #E4405F;">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
-                </svg>
-              </div>
-              <div class="share-platform-name">Instagram</div>
-            </div>
-            <div class="share-platform" data-platform="line">
-              <div class="share-platform-icon" style="background-color: #06C755;">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-                  <path d="M19.365 9.89c.50 0 .907.41.907.91 0 .5-.407.91-.907.91H17.59v1.306h1.775c.5 0 .907.41.907.91 0 .5-.407.91-.907.91H16.59c-.5 0-.908-.41-.908-.91V9.89c0-.5.407-.91.908-.91h2.775zm-5.442 4.036c.5 0 .907.41.907.91 0 .5-.407.91-.907.91h-2.775c-.5 0-.907-.41-.907-.91V9.89c0-.5.407-.91.907-.91.5 0 .908.41.908.91v3.126h1.867zm-4.75-3.126c.5 0 .908.41.908.91 0 .5-.408.91-.908.91H7.407v.406h1.766c.5 0 .908.41.908.91 0 .5-.408.91-.908.91H7.407v.406h1.766c.5 0 .908.41.908.91 0 .5-.408.91-.908.91H6.407c-.5 0-.907-.41-.907-.91V9.89c0-.5.407-.91.907-.91h2.766zm10.256-2.895C20.418 6.33 21 5.19 21 3.994 21 2.893 19.978 2 18.672 2c-1.307 0-2.33.893-2.33 1.994 0 .893.558 1.674 1.388 1.92.168.056.28.224.28.392v.073c0 .112-.056.224-.168.28-.056.056-.112.056-.168.056h-.336c-2.33 0-4.494.955-6.16 2.546-1.667 1.59-2.666 3.746-2.666 6.068 0 4.71 3.972 8.566 8.826 8.566 4.855 0 8.826-3.856 8.826-8.566 0-1.87-.67-3.69-1.89-5.156-.112-.112-.112-.336 0-.448.112-.112.28-.112.392-.056.67.336 1.307.728 1.89 1.19.112.112.28.112.392 0 .112-.112.112-.28 0-.392-2.053-2.21-4.83-3.466-7.77-3.466h-.28c-.112 0-.224-.056-.28-.168-.056-.112-.056-.224 0-.336.112-.224.224-.448.28-.67z"/>
-                </svg>
-              </div>
-              <div class="share-platform-name">LINE</div>
-            </div>
-            <div class="share-platform" data-platform="download">
-              <div class="share-platform-icon" style="background-color: #333;">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-                  <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-                </svg>
-              </div>
-              <div class="share-platform-name">Save</div>
-            </div>
-          </div>
+          <button id="universalShareButton" class="universal-share-button">
+            <svg class="share-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white">
+              <path d="M0 0h24v24H0z" fill="none"/>
+              <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
+            </svg>
+          </button>
         </div>
       </div>
 
     <!-- Navigation bar -->
     <div class="nav-bar">
       <a href="index.html" class="nav-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24.466" height="29.186" viewBox="0 0 24.466 29.186">
-          <path id="Path_293" data-name="Path 293" d="M64.785,9.191h0L55.964.923a3.414,3.414,0,0,0-4.67,0L42.476,9.191A3.414,3.414,0,0,0,41.4,11.682v14.09a3.414,3.414,0,0,0,3.414,3.414H62.449a3.414,3.414,0,0,0,3.414-3.414V11.682A3.416,3.416,0,0,0,64.785,9.191Zm-1.64,16.581a.7.7,0,0,1-.7.7h-5.8V20.426H50.609v6.041h-5.8a.695.695,0,0,1-.7-.7V11.682a.692.692,0,0,1,.219-.507l8.819-8.268a.7.7,0,0,1,.95,0l8.819,8.268h0a.7.7,0,0,1,.22.508v14.09Z" transform="translate(-41.397 0)" fill="#fff"/>
-        </svg> 
+       
         <span>HOME</span>
       </a>
       <a href="#" class="nav-icon">
-        <svg id="ハンドルアイコン1" xmlns="http://www.w3.org/2000/svg" width="29.186" height="29.186" viewBox="0 0 29.186 29.186">
-          <path id="Path_294" data-name="Path 294" d="M232.675,245.5a1.41,1.41,0,1,0,1.41,1.411A1.411,1.411,0,0,0,232.675,245.5Z" transform="translate(-218.082 -231.502)" fill="#fff"/>
-          <path id="Path_295" data-name="Path 295" d="M24.912,4.274a14.594,14.594,0,1,0,4.274,10.319A14.557,14.557,0,0,0,24.912,4.274ZM12.654,21.96c-.143,1.9-.7,3.242-2.66,2.394a10.845,10.845,0,0,1-5.273-5.4c-.733-1.928,1-2.615,4.055-2.03A4.468,4.468,0,0,1,12.654,21.96Zm1.939-4.3A2.256,2.256,0,1,1,16.849,15.4,2.256,2.256,0,0,1,14.593,17.659Zm9.871,1.29a10.845,10.845,0,0,1-5.273,5.4c-1.955.849-2.517-.5-2.66-2.394a4.468,4.468,0,0,1,3.877-5.04C23.468,16.334,25.2,17.021,24.464,18.949Zm-3.526-5.837a29.35,29.35,0,0,0-6.345-1.269,29.354,29.354,0,0,0-6.345,1.269c-3.031.846-4.31-.686-3.676-2.519a10.793,10.793,0,0,1,20.042,0C25.248,12.427,23.969,13.959,20.938,13.113Z" transform="translate(0 0)" fill="#fff"/>
-        </svg> 
+        
         <span>DRIVER</span>
       </a>
       <a href="#" class="nav-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="47.601" height="33.263" viewBox="0 0 47.601 33.263">
-          <g id="Group_2758" data-name="Group 2758" transform="translate(-177.949 -745.737)">
-            <path id="Path_457" data-name="Path 457" d="M427.535,420.105a1.464,1.464,0,0,0,.646-1.164c0-1.012-1.191-1.774-2.771-1.774a2.736,2.736,0,0,0-2.694,1.342,4.483,4.483,0,0,0-.873-.083c-1.58,0-2.771.763-2.771,1.774s1.191,1.774,2.771,1.774a4.326,4.326,0,0,0,1.146-.148c.25.823,1.335,1.407,2.716,1.407,1.58,0,2.771-.763,2.771-1.774a1.59,1.59,0,0,0-.942-1.354m-3.984.213a1.886,1.886,0,0,0-.288.277,2.73,2.73,0,0,1-1.419.348c-1.046,0-1.74-.447-1.74-.743s.694-.743,1.74-.743a3.154,3.154,0,0,1,.983.148,1.939,1.939,0,0,0,.739.681.319.319,0,0,1-.015.032m.12-1.377a.236.236,0,0,1,.018-.086,1.967,1.967,0,0,1,1.722-.657c1.046,0,1.74.447,1.74.743s-.694.743-1.74.743a3.154,3.154,0,0,1-.983-.148c-.475-.157-.756-.406-.756-.595m2.035,3.261c-1.046,0-1.74-.447-1.74-.743a.257.257,0,0,1,.032-.118,1.888,1.888,0,0,0,.288-.277,2.729,2.729,0,0,1,1.419-.348c1.046,0,1.74.447,1.74.743s-.694.743-1.74.743" transform="translate(-202.927 355.767)" fill="#fff"/>
-            <path id="Path_458" data-name="Path 458" d="M7.057,367.391a1.263,1.263,0,0,0,.093-.475c0-1.012-1.191-1.774-2.771-1.774s-2.771.763-2.771,1.774a1.325,1.325,0,0,0,.3.825c-1.13.222-1.906.876-1.906,1.693,0,1.012,1.191,1.774,2.771,1.774a3.637,3.637,0,0,0,2.047-.554,4.27,4.27,0,0,0,1.239.175c1.58,0,2.771-.763,2.771-1.774,0-.783-.715-1.417-1.771-1.664m-4.286,2.786c-1.046,0-1.74-.447-1.74-.743s.694-.743,1.74-.743a3.422,3.422,0,0,1,.557.045,1.259,1.259,0,0,0-.042.319,1.379,1.379,0,0,0,.439.984,3.176,3.176,0,0,1-.954.139m-.132-3.261c0-.3.694-.743,1.74-.743s1.74.447,1.74.743c0,.112-.1.246-.281.369a3.788,3.788,0,0,0-1.531.373c-1.006-.02-1.668-.453-1.668-.742M6.057,369.8a3.414,3.414,0,0,1-.557-.045,2.78,2.78,0,0,1-.5-.129,1.627,1.627,0,0,1-.512-.285.564.564,0,0,0-.15-.19.24.24,0,0,1-.022-.095c0-.111.1-.242.273-.364l.008-.005a1.955,1.955,0,0,1,.5-.235,3.179,3.179,0,0,1,.954-.139h.072c1.006.02,1.668.453,1.668.742s-.694.743-1.74.743" transform="translate(177.949 407.638)" fill="#fff"/>
-            <path id="Path_459" data-name="Path 459" d="M16.23,131.985l.727-2.28,2.28-.727-2.28-.727-.727-2.28-.727,2.28-2.28.727,2.28.727Z" transform="translate(167.809 629.239)" fill="#fff"/>
-            <path id="Path_460" data-name="Path 460" d="M473.5,146.495l.346,3,1.456-2.65,3-.346-2.65-1.456-.346-3-1.456,2.65-3,.346Z" transform="translate(-255.402 614.377)" fill="#fff"/>
-            <path id="Path_461" data-name="Path 461" d="M119.9,17.637a2.154,2.154,0,0,0-.17-1.211L116.1,11.412l3.765-3.757c.323-.355.121-1.4.047-1.706a10.439,10.439,0,0,0-1.006-2.6,7.159,7.159,0,0,0-1.661-2.123A5.283,5.283,0,0,0,113.813,0H97.062a5.283,5.283,0,0,0-3.435,1.226A7.16,7.16,0,0,0,91.967,3.35a10.446,10.446,0,0,0-1.006,2.6c-.073.3-.275,1.35.048,1.706l3.765,3.757-3.631,5.014a2.154,2.154,0,0,0-.17,1.211l2.17,14.115h24.59Zm-3.373-4.184c0,.32-.44.668-1.112.843h0q-.068.017-.138.033h-.006l-.137.026-.009,0-.141.021-.023,0-.136.014h-.011l-.145.009h-.033c-.05,0-.1,0-.15,0a3.382,3.382,0,0,1-1.409-.284,1.637,1.637,0,0,1-.426-.277.594.594,0,0,1-.21-.37c0-.009,0-.019,0-.028,0-.3.376-.616.964-.8a3.274,3.274,0,0,1,.408-.1,3.757,3.757,0,0,1,.414-.05c.069,0,.138-.007.209-.008h.051c1.171,0,2.046.506,2.046.958m-4.913.177c-.085.005-.172.009-.26.009a3.58,3.58,0,0,1-1.168-.186,1.229,1.229,0,0,0,.163-.6c0-.036,0-.071-.005-.107s-.005-.041-.008-.061,0-.026-.006-.039-.011-.054-.017-.08l0-.014c-.008-.03-.017-.06-.027-.089a1.443,1.443,0,0,0-.281-.476,3.432,3.432,0,0,1,1.354-.259,3.382,3.382,0,0,1,1.409.284,2.528,2.528,0,0,0-.689.452h0c-.021.02-.042.041-.062.061l-.032.035-.045.051-.035.043-.039.052-.023.033c-.017.024-.032.048-.047.073l-.017.03q-.018.032-.035.064l-.011.022c-.013.027-.025.055-.036.083l-.01.027c-.011.029-.021.058-.029.087l0,.017q-.011.041-.02.082l0,.019q-.009.047-.013.094c0,.007,0,.014,0,.021,0,.033,0,.066,0,.1a1.188,1.188,0,0,0,.014.177M103.5,15.975a3.957,3.957,0,0,1-1.048,0,3.468,3.468,0,0,1-.422-.084,2.815,2.815,0,0,1-.405-.14c-.428-.188-.689-.451-.689-.7a.476.476,0,0,1,.106-.281.908.908,0,0,1,.116-.127,1.435,1.435,0,0,1,.229-.169,2.145,2.145,0,0,1,.273-.137c.058-.024.119-.047.182-.069a3.6,3.6,0,0,1,1.139-.176,3.785,3.785,0,0,1,.826.089,2.883,2.883,0,0,1,.566.187q-.056.032-.108.066a1.529,1.529,0,0,0-.8,1.252,1.188,1.188,0,0,0,.036.288m-2.965-2.625a.5.5,0,0,1-.133-.314.58.58,0,0,1,.223-.408c.018-.017.038-.034.059-.05l.027-.02.036-.027.037-.026.029-.019a3.124,3.124,0,0,1,1.635-.408,3.163,3.163,0,0,1,1.61.392l.036.023.023.016.029.02.023.017.027.02.022.017.025.021.02.017.023.022.018.017.023.024.014.015.033.039.006.008.023.032.01.015.016.025.009.016.012.024.008.017.01.024.006.017c0,.008.005.017.007.025l0,.016c0,.009,0,.018,0,.027s0,.009,0,.013a.361.361,0,0,1,0,.04.58.58,0,0,1-.223.408,4.444,4.444,0,0,0-1.29-.184,4.015,4.015,0,0,0-1.935.454,1.473,1.473,0,0,1-.512-.364m4.484,1.625a2.873,2.873,0,0,1,.4-.133,3.491,3.491,0,0,1,.409-.079,3.912,3.912,0,0,1,.518-.034,3.126,3.126,0,0,1,1.639.409,1.192,1.192,0,0,0-.065.386,1.236,1.236,0,0,0,.178.631,2.5,2.5,0,0,1-1.083.432h-1.331a3.019,3.019,0,0,1-.73-.219,1.814,1.814,0,0,1-.35-.207c-.02-.015-.041-.031-.059-.047a.674.674,0,0,1-.237-.352.375.375,0,0,1-.008-.076c0-.253.275-.523.722-.712m2.449-1.169c-1.171,0-2.046-.506-2.046-.958a.368.368,0,0,1,0-.046s0-.009,0-.014,0-.022.007-.033l0-.016c0-.011.007-.021.011-.032l.006-.015q.007-.017.016-.034l.006-.012c.007-.013.015-.026.023-.039l0-.007a2.479,2.479,0,0,1,1.963-.71,3.58,3.58,0,0,1,1.168.186,2.367,2.367,0,0,1,.381.17,1.372,1.372,0,0,1,.335.254.527.527,0,0,1,.162.348.414.414,0,0,1-.045.18.886.886,0,0,1-.279.31,1.905,1.905,0,0,1-.369.209,3.432,3.432,0,0,1-1.354.259m6.343-11.894c.515,0,1.405.537,2.217,2.05.092.172.176.344.254.513a3.5,3.5,0,0,0-1.275.925h-2.681a11.078,11.078,0,0,0-.449-2.045,5.987,5.987,0,0,0-.68-1.444ZM100.66,3.561a4.279,4.279,0,0,1,.9-1.65h7.75a4.279,4.279,0,0,1,.9,1.65,10.327,10.327,0,0,1,.41,1.839H100.249a10.325,10.325,0,0,1,.41-1.839m-5.815.4c.812-1.513,1.7-2.05,2.217-2.05h2.615A5.987,5.987,0,0,0,99,3.355,11.077,11.077,0,0,0,98.547,5.4H95.866a3.5,3.5,0,0,0-1.275-.925c.077-.169.162-.341.254-.513m-1.237,3.8h23.658l-2.716,2.71H96.324Zm5.984,5.5a2.829,2.829,0,0,1-1.824.55l-.14,0-.037,0-.117-.007h-.021l-.131-.013-.032,0-.1-.014-.028,0-.123-.022-.025-.005-.1-.022-.028-.007-.114-.03-.012,0-.1-.03-.026-.009q-.107-.036-.2-.078l-.021-.009-.084-.039-.01,0-.088-.046-.015-.009-.07-.042-.012-.008q-.039-.025-.074-.051l-.008-.006-.06-.047-.012-.01c-.021-.018-.041-.036-.06-.055a.553.553,0,0,1-.192-.379c0-.452.875-.958,2.046-.958a2.789,2.789,0,0,1,1.841.568h0l.027.026c.016.016.032.033.046.049a1.21,1.21,0,0,0-.111.5,1.183,1.183,0,0,0,.021.22M94.7,16.061l-.054-.032-.005,0-.05-.033-.006,0-.046-.033-.007,0-.042-.033-.007-.006-.038-.033-.007-.006-.034-.033-.007-.007-.031-.033-.006-.007-.028-.033,0-.006L94.3,15.72l0,0a.454.454,0,0,1-.084-.249c0-.227.221-.468.59-.651l.015-.007.058-.028.022-.009.054-.023.027-.011.053-.021.03-.011.052-.019.033-.011.053-.017.036-.011.054-.015.038-.01.054-.014.04-.009.055-.012.041-.009.057-.009.044-.007.059-.008.045-.005.062-.006.045,0,.066,0,.043,0,.074,0h.036l.112,0a3.752,3.752,0,0,1,.884.1,1.307,1.307,0,0,0-.338.855c0,.035,0,.07.005.1,0,.012,0,.025,0,.037s.006.043.01.065.006.031.009.046.008.034.013.051.009.035.015.053l.009.025a1.3,1.3,0,0,0,.06.148h0c.013.026.026.052.041.077l.005.009c.015.026.03.051.047.077a1.6,1.6,0,0,0,.121.162,3.752,3.752,0,0,1-.884.1,3.357,3.357,0,0,1-1.434-.3h0l-.063-.032,0,0-.059-.032,0,0m3,12.709a4.087,4.087,0,0,0-2.262-1.729l-.726-4.725a4.093,4.093,0,0,0,2.016-2.18h1.917l.67,8.633ZM98.8,16.323a2.922,2.922,0,0,1-.436-.142c-.05-.021-.1-.043-.142-.066h0l-.087-.046-.019-.011-.064-.038c-.028-.018-.054-.035-.079-.054a.674.674,0,0,1-.334-.5.674.674,0,0,1,.334-.5,1.96,1.96,0,0,1,.393-.216,2.922,2.922,0,0,1,.436-.142,3.751,3.751,0,0,1,.884-.1,3.91,3.91,0,0,1,.53.036,1.21,1.21,0,0,0-.113.506c0,.028,0,.055,0,.083,0,.01,0,.019,0,.029s0,.035.006.053,0,.023.006.035.005.03.008.045.006.025.009.038.007.027.011.04.008.027.012.04l.012.036.016.043.013.032.02.045.013.027.025.049.011.019c.011.018.021.037.032.055l0,0a1.8,1.8,0,0,0,.4.437c.038.03.076.06.117.088a3.6,3.6,0,0,1-1.139.176,3.752,3.752,0,0,1-.884-.1m11.09,12.447h-8.912l-.67-8.633h10.253Zm-.58-12.609h0l-.079-.043h0l-.074-.045a1.006,1.006,0,0,1-.353-.349.425.425,0,0,1-.054-.2.375.375,0,0,1,.013-.094.744.744,0,0,1,.283-.375,2.96,2.96,0,0,1,1.751-.489c1.171,0,2.046.506,2.046.958a.361.361,0,0,1,0,.042c0,.006,0,.012,0,.017s0,.017,0,.025,0,.015-.006.022,0,.013-.006.02-.007.017-.01.026l-.007.016-.015.029-.007.013-.019.032-.006.01-.024.034-.005.007-.03.036,0,.005-.035.037,0,0-.041.038h0l-.046.039h0a2.927,2.927,0,0,1-1.771.5,3.306,3.306,0,0,1-1.485-.321m6.125,10.88a4.087,4.087,0,0,0-2.262,1.729h-1.615l.67-8.633h1.917a4.093,4.093,0,0,0,2.016,2.18Zm2.082-10.454h-3.81a.508.508,0,0,1-.141-.324.622.622,0,0,1,.272-.45l0,0,.042-.033.007-.005.042-.03.011-.007.042-.028L114,15.7l.043-.026.016-.009.044-.024.018-.01.045-.023.02-.009.047-.022.018-.007q.083-.034.174-.064l.033-.011.043-.013.04-.012.042-.011.044-.012.042-.01.046-.011.042-.009.048-.01.043-.008.05-.009.043-.007.052-.008.044-.006.054-.007.044,0,.057-.005.043,0,.061,0,.04,0,.069,0h.139l.119,0h.035l.083,0,.038,0,.08.006.034,0,.086.009.025,0,.1.015h0c.114.018.223.041.327.068.673.175,1.112.522,1.112.843a.508.508,0,0,1-.141.324" transform="translate(96.414 745.737)" fill="#fff"/>
-          </g>
-        </svg> 
+        
         <span>CIRCUIT</span>
       </a>
       <a href="#" class="nav-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="26" viewBox="0 0 32 26">
-          <g id="MENU" transform="translate(1 1)">
-            <line id="Line_6" data-name="Line 6" x2="30" fill="none" stroke="#fff" stroke-linecap="round" stroke-width="2"/>
-            <line id="Line_7" data-name="Line 7" x2="30" transform="translate(0 12)" fill="none" stroke="#fff" stroke-linecap="round" stroke-width="2"/>
-            <line id="Line_8" data-name="Line 8" x2="30" transform="translate(0 24)" fill="none" stroke="#fff" stroke-linecap="round" stroke-width="2"/>
-          </g>
-        </svg>
+       
         <span></span>
       </a>
     </div>
   </div>
+
 
     <script>
       document.addEventListener("DOMContentLoaded", function () {
@@ -617,14 +592,14 @@
 
         const gameState = {
           status: "initializing",
-          difficulty: "beginner",
+          difficulty: "challenge",
           userPath: [],
           lastPoint: null,
           isDrawing: false,
           startPoint: { x: 0, y: 0 },
           startRadius: 8,
           circuitPath: [],
-          segmentVisibility: [], // Added for segment visibility
+          segmentVisibility: [], // For segment visibility
           completionThreshold: 20,
           accuracy: 0,
           minDrawDistance: 1,
@@ -633,15 +608,57 @@
           redrawScheduled: false,
           touchActive: false,
           lastTouchTime: 0,
+          
+          // Path progression tracking for better accuracy calculation
           pathProgression: 0,
           lastSegmentIndex: 0,
           accuracyPoints: 0,
           totalPossiblePoints: 0,
           segmentsVisited: new Set(),
           visitedInOrder: [],
-          minCircuitCoverage: 0.7,
-          fullLoopRequired: true,
-          lastCheckpointIndex: -1
+          minCircuitCoverage: 0.2,    // Lower threshold for completion
+          fullLoopRequired: false,    // Don't require full loop
+          lastCheckpointIndex: -1,
+          
+          // Flag to prevent drawing after completion
+          circuitCompleted: false,
+          
+          // Flag to track if we're in the process of calculating accuracy
+          calculatingAccuracy: false,
+          
+          // Flag to control straight line behavior when lifting finger
+          preventStraightLines: true, // Changed to prevent connecting lines when lifting finger
+          
+          // Flag to allow completion without full circuit
+          allowPartialCompletion: true, // Allow showing results even with partial completion
+          
+          // Minimum time (ms) before allowing completion check
+          minPlayTime: 1000, // Reduced to allow quicker completion
+          gameStartTime: 0,
+          
+          // Track if we're currently in a continuous drawing or starting a new segment
+          isNewSegment: false,
+          
+          // Track segments that have been touched at least once
+          touchedSegments: new Set(),
+          
+          // Track all segments (visible and invisible) for accuracy
+          allSegmentsTouched: new Set(),
+          
+          // Track if we should check for completion on finger lift
+          checkCompletionOnLift: true,
+          
+          // Quick completion when near end point
+          quickCompletionEnabled: true,
+          
+          // Add additional flags to control completion checking
+          justResumedDrawing: false,
+          minDistanceAfterResume: 30,
+          distanceSinceResume: 0,
+          resumePoint: null,
+          
+          // Prevent accidental quick completions
+          quickCompletionThreshold: 15
         };
 
         function resizeCanvas() {
@@ -667,46 +684,44 @@
         window.addEventListener("resize", resizeCanvas);
 
         function initializeCircuitPath() {
-  const baseCoordinates = [
-    { x: 73, y: 150 }, { x: 75, y: 80 }, { x: 75, y: 50 }, { x: 100, y: 38 },
-    { x: 115, y: 60 }, { x: 110, y: 95 }, { x: 100, y: 110 }, { x: 125, y: 120 },
-    { x: 100, y: 150 }, { x: 115, y: 155 }, { x: 130, y: 180 }, { x: 90, y: 200 },
-    { x: 90, y: 220 }, { x: 110, y: 240 }, { x: 140, y: 230 }, { x: 150, y: 250 },
-    { x: 205, y: 230 }, { x: 180, y: 300 }, { x: 135, y: 340 }, { x: 200, y: 320 },
-    { x: 225, y: 340 }, { x: 220, y: 430 }, { x: 270, y: 450 }, { x: 270, y: 420 },
-    { x: 240, y: 300 }, { x: 200, y: 300 }, { x: 180, y: 270 }, { x: 73, y: 250 },
-    { x: 73, y: 150 }
-  ];
+          const baseCoordinates = [
+            { x: 73, y: 150 }, { x: 75, y: 80 }, { x: 75, y: 50 }, { x: 100, y: 38 },
+            { x: 115, y: 60 }, { x: 110, y: 95 }, { x: 100, y: 110 }, { x: 125, y: 120 },
+            { x: 100, y: 150 }, { x: 115, y: 155 }, { x: 130, y: 180 }, { x: 90, y: 200 },
+            { x: 90, y: 220 }, { x: 110, y: 240 }, { x: 140, y: 230 }, { x: 150, y: 250 },
+            { x: 205, y: 230 }, { x: 180, y: 300 }, { x: 135, y: 340 }, { x: 200, y: 320 },
+            { x: 225, y: 340 }, { x: 220, y: 430 }, { x: 270, y: 450 }, { x: 270, y: 420 },
+            { x: 240, y: 300 }, { x: 200, y: 300 }, { x: 180, y: 270 }, { x: 73, y: 250 },
+            { x: 73, y: 150 }
+          ];
 
-  const scaleX = canvas.width / 350;
-  const scaleY = canvas.height / 500;
+          const scaleX = canvas.width / 350;
+          const scaleY = canvas.height / 500;
 
-  gameState.startPoint = {
-    x: baseCoordinates[0].x * scaleX,
-    y: baseCoordinates[0].y * scaleY,
-  };
+          gameState.startPoint = {
+            x: baseCoordinates[0].x * scaleX,
+            y: baseCoordinates[0].y * scaleY,
+          };
 
-  gameState.circuitPath = baseCoordinates.map((point) => ({
-    x: point.x * scaleX,
-    y: point.y * scaleY,
-  }));
+          gameState.circuitPath = baseCoordinates.map((point) => ({
+            x: point.x * scaleX,
+            y: point.y * scaleY,
+          }));
 
-  // Initialize segmentVisibility with selective visibility to match the image (~10-12 visible segments)
-  gameState.segmentVisibility = Array(gameState.circuitPath.length - 1).fill(0); // Default to hidden
-  // Set visible segments based on the image pattern
-  gameState.segmentVisibility[1] = 1;  // Start to first vertical
-  gameState.segmentVisibility[4] = 1;  // Top loop curve
-  gameState.segmentVisibility[9] = 1;  // S-curve start
-  gameState.segmentVisibility[12] = 1; // S-curve to lower loop
-  gameState.segmentVisibility[14] = 1; // Lower loop curve
-  gameState.segmentVisibility[19] = 1; // Lower loop to top loop
-  gameState.segmentVisibility[22] = 1; // Final approach
-  
+          // Initialize segmentVisibility with selective visibility to match the image (~10-12 visible segments)
+          gameState.segmentVisibility = Array(gameState.circuitPath.length - 1).fill(0); // Default to hidden
+          // Set visible segments based on the image pattern
+          gameState.segmentVisibility[1] = 1;  // Start to first vertical
+          gameState.segmentVisibility[4] = 1;  // Top loop curve
+          gameState.segmentVisibility[9] = 1;  // S-curve start
+          gameState.segmentVisibility[12] = 1; // S-curve to lower loop
+          gameState.segmentVisibility[14] = 1; // Lower loop curve
+          gameState.segmentVisibility[19] = 1; // Lower loop to top loop
+          gameState.segmentVisibility[22] = 1; // Final approach
 
-
-  positionStartElements();
-  drawCircuit();
-}
+          positionStartElements();
+          drawCircuit();
+        }
 
         function positionStartElements() {
           const startPointElem = document.getElementById("startPoint");
@@ -720,7 +735,6 @@
         function showStartTooltip() {
           const tooltip = document.createElement("div");
           tooltip.className = "start-tooltip";
-          tooltip.textContent = "";
           tooltip.style.left = `${gameState.startPoint.x - 100}px`;
           tooltip.style.top = `${gameState.startPoint.y + 100}px`;
           document.body.appendChild(tooltip);
@@ -734,75 +748,117 @@
           gameState.startTooltip = tooltip;
         }
 
-          function drawCircuit() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        function drawCircuit() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            for (let i = 0; i < gameState.circuitPath.length - 1; i++) {
-              if (gameState.segmentVisibility[i] === 1) {
-                const current = gameState.circuitPath[i];
-                const next = gameState.circuitPath[i + 1];
-                
-                ctx.beginPath();
-                ctx.moveTo(current.x, current.y);
-                
-                if (i < gameState.circuitPath.length - 2 && gameState.segmentVisibility[i + 1] === 1) {
-                  const nextNext = gameState.circuitPath[i + 2];
-                  const xc = (current.x + next.x) / 2;
-                  const yc = (current.y + next.y) / 2;
-                  ctx.quadraticCurveTo(next.x, next.y, xc, yc);
-                } else {
-                  ctx.lineTo(next.x, next.y);
-                }
-                
-                ctx.strokeStyle = "rgba(0, 0, 180, 0.9)";
-                ctx.lineWidth = 6;
-                ctx.stroke();
-              }
-            }
-
-            ctx.beginPath();
-            ctx.arc(gameState.startPoint.x, gameState.startPoint.y, gameState.startRadius, 0, Math.PI * 2);
-            ctx.fillStyle = "#ff6699";
-            ctx.fill();
-
-            if (gameState.status === "ready") {
-              const pulseSize = gameState.startRadius * 1.5 + Math.sin(Date.now() / 200) * 3;
+          // Keep the existing drawing code for visible segments
+          for (let i = 0; i < gameState.circuitPath.length - 1; i++) {
+            if (gameState.segmentVisibility[i] === 1) {
+              const current = gameState.circuitPath[i];
+              const next = gameState.circuitPath[i + 1];
+              
               ctx.beginPath();
-              ctx.arc(gameState.startPoint.x, gameState.startPoint.y, pulseSize, 0, Math.PI * 2);
-              ctx.strokeStyle = "#ff6699";
-              ctx.lineWidth = 2;
+              ctx.moveTo(current.x, current.y);
+              
+              if (i < gameState.circuitPath.length - 2 && gameState.segmentVisibility[i + 1] === 1) {
+                const nextNext = gameState.circuitPath[i + 2];
+                const xc = (current.x + next.x) / 2;
+                const yc = (current.y + next.y) / 2;
+                ctx.quadraticCurveTo(next.x, next.y, xc, yc);
+              } else {
+                ctx.lineTo(next.x, next.y);
+              }
+              
+              ctx.strokeStyle = "rgba(0, 0, 180, 0.9)";
+              ctx.lineWidth = 6;
               ctx.stroke();
-              requestAnimationFrame(drawCircuit);
             }
           }
 
-          function drawUserPath() {
-            if (gameState.userPath.length < 2) return;
+          // Draw start point
+          ctx.beginPath();
+          ctx.arc(gameState.startPoint.x, gameState.startPoint.y, gameState.startRadius, 0, Math.PI * 2);
+          ctx.fillStyle = "#ff6699";
+          ctx.fill();
 
+          // Add a pulsing effect to the start point
+          if (gameState.status === "ready") {
+            const pulseSize = gameState.startRadius * 1.5 + Math.sin(Date.now() / 200) * 3;
             ctx.beginPath();
-            ctx.moveTo(gameState.userPath[0].x, gameState.userPath[0].y);
+            ctx.arc(gameState.startPoint.x, gameState.startPoint.y, pulseSize, 0, Math.PI * 2);
+            ctx.strokeStyle = "#ff6699";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            if (gameState.status === "ready") {
+              requestAnimationFrame(drawCircuit);
+            }
+          }
+        }
 
-            for (let i = 1; i < gameState.userPath.length - 1; i++) {
-              const current = gameState.userPath[i];
-              const next = gameState.userPath[i + 1];
+        function drawUserPath() {
+          if (gameState.userPath.length < 2) return;
+
+          ctx.beginPath();
+
+          // Draw each segment of the user path separately (no connections between lifted segments)
+          let segments = [];
+          let currentSegment = [];
+          
+          // First point is always the start of a segment
+          currentSegment.push(gameState.userPath[0]);
+          
+          // Identify segments based on large distances (lifted finger)
+          for (let i = 1; i < gameState.userPath.length; i++) {
+            const prev = gameState.userPath[i-1];
+            const curr = gameState.userPath[i];
+            const distance = distanceBetween(prev, curr);
+            
+            // If distance is too large, it means the finger was lifted
+            if (distance > 30) { // Threshold to detect lifted finger
+              if (currentSegment.length > 0) {
+                segments.push([...currentSegment]);
+                currentSegment = [];
+              }
+            }
+            
+            currentSegment.push(curr);
+          }
+          
+          // Add the last segment
+          if (currentSegment.length > 0) {
+            segments.push(currentSegment);
+          }
+          
+          // Draw each segment with smooth curves
+          for (const segment of segments) {
+            if (segment.length < 2) continue;
+            
+            ctx.beginPath();
+            ctx.moveTo(segment[0].x, segment[0].y);
+            
+            for (let i = 1; i < segment.length - 1; i++) {
+              const current = segment[i];
+              const next = segment[i + 1];
               const xc = (current.x + next.x) / 2;
               const yc = (current.y + next.y) / 2;
               ctx.quadraticCurveTo(current.x, current.y, xc, yc);
             }
-
-            if (gameState.userPath.length > 1) {
-              const last = gameState.userPath[gameState.userPath.length - 1];
-              ctx.lineTo(last.x, last.y);
-            }
-
+            
+            // Connect to the last point in the segment
+            const last = segment[segment.length - 1];
+            ctx.lineTo(last.x, last.y);
+            
+            // Apply stroke for current segment
             ctx.strokeStyle = "rgba(0, 0, 180, 0.9)"; // blue
             ctx.lineWidth = 3;
-            ctx.lineCap = "round"; // Add rounded ends to the line
-            ctx.lineJoin = "round"; // Add rounded corners
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
             ctx.stroke();
-
-            drawCircuitOverlay();
           }
+
+          drawCircuitOverlay();
+        }
 
         function drawCircuitOverlay() {
           for (let i = 0; i < gameState.circuitPath.length - 1; i++) {
@@ -855,24 +911,37 @@
         function findClosestPointOnPath(point) {
           let minDist = Infinity;
           let closestPoint = null;
+          let closestSegmentIndex = -1;
+          
+          // Check all segments, not just visible ones
           for (let i = 0; i < gameState.circuitPath.length - 1; i++) {
             const p1 = gameState.circuitPath[i];
             const p2 = gameState.circuitPath[i + 1];
+            
             const closest = closestPointOnSegment(point, p1, p2);
             const dist = distanceBetween(point, closest);
+            
             if (dist < minDist) {
               minDist = dist;
               closestPoint = closest;
+              closestSegmentIndex = i;
             }
           }
-          return { point: closestPoint, distance: minDist };
+          
+          return { 
+            point: closestPoint, 
+            distance: minDist,
+            segmentIndex: closestSegmentIndex
+          };
         }
 
         function closestPointOnSegment(p, v, w) {
           const l2 = distanceSquared(v, w);
           if (l2 === 0) return v;
+          
           let t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
           t = Math.max(0, Math.min(1, t));
+          
           return {
             x: v.x + t * (w.x - v.x),
             y: v.y + t * (w.y - v.y)
@@ -887,179 +956,117 @@
           return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
         }
 
-        function checkCompletion() {
-          if (gameState.userPath.length < 10) return false;
+        function checkCompletion(forceCheck = false) {
+          // Don't check completion if we're already completed or calculating
+          if (gameState.circuitCompleted || gameState.calculatingAccuracy) return false;
+          
+          // Need a minimum path length
+          if (gameState.userPath.length < 5) return false;
+          
+          // Need minimum play time before allowing completion check
+          if (!forceCheck && Date.now() - gameState.gameStartTime < gameState.minPlayTime) return false;
+          
+          // Skip completion check if we just resumed drawing and haven't moved enough
+          if (gameState.justResumedDrawing && gameState.distanceSinceResume < gameState.minDistanceAfterResume) {
+            return false;
+          }
+
           const lastPoint = gameState.userPath[gameState.userPath.length - 1];
-          const distance = distanceBetween(lastPoint, gameState.startPoint);
-          let totalDistance = 0;
-          for (let i = 1; i < gameState.userPath.length; i++) {
-            totalDistance += distanceBetween(gameState.userPath[i-1], gameState.userPath[i]);
+          
+          // Check if near start point
+          const dxStart = lastPoint.x - gameState.startPoint.x;
+          const dyStart = lastPoint.y - gameState.startPoint.y;
+          const distanceToStart = Math.sqrt(dxStart * dxStart + dyStart * dyStart);
+          
+          // Check if near end point (which is the same as start point in a circuit)
+          const endPoint = gameState.circuitPath[gameState.circuitPath.length - 1];
+          const dxEnd = lastPoint.x - endPoint.x;
+          const dyEnd = lastPoint.y - endPoint.y;
+          const distanceToEnd = Math.sqrt(dxEnd * dxEnd + dyEnd * dyEnd);
+
+          // Calculate percentage of segments touched
+          const totalSegments = gameState.circuitPath.length - 1;
+          const touchedSegmentCount = gameState.allSegmentsTouched.size;
+          const segmentPercentage = touchedSegmentCount / totalSegments;
+          
+          // Check completion conditions
+          let isCompleted = false;
+          
+          // Condition 1: Near start/end point with enough segments covered
+          if ((distanceToStart < gameState.completionThreshold || 
+               distanceToEnd < gameState.completionThreshold) &&
+              segmentPercentage >= gameState.minCircuitCoverage) {
+            isCompleted = true;
           }
-          let circuitLength = 0;
-          for (let i = 1; i < gameState.circuitPath.length; i++) {
-            circuitLength += distanceBetween(gameState.circuitPath[i-1], gameState.circuitPath[i]);
+          
+          // Condition 2: Only check on explicit force check (lifting finger) with enough coverage
+          if (forceCheck && gameState.allowPartialCompletion && 
+              segmentPercentage >= gameState.minCircuitCoverage) {
+            // Only if we're near the end point
+            if (distanceToEnd < gameState.completionThreshold * 2) {
+              isCompleted = true;
+            }
           }
-          const minRequiredDistance = circuitLength * 0.8;
-          if (distance < gameState.completionThreshold && totalDistance >= minRequiredDistance) {
-            calculateAccuracy();
+          
+          // Condition 3: Quick completion only when very close to end point (prevents accidental triggers)
+          if (gameState.quickCompletionEnabled && 
+              distanceToEnd < gameState.quickCompletionThreshold &&
+              segmentPercentage >= gameState.minCircuitCoverage) {
+            isCompleted = true;
+          }
+          
+          if (isCompleted) {
+            // Set circuit as completed to prevent further drawing
+            gameState.circuitCompleted = true;
+            gameState.calculatingAccuracy = true;
+            
+            setTimeout(() => {
+              calculateAccuracy();
+              gameState.calculatingAccuracy = false;
+              showResultScreen();
+            }, 100);
+            
             return true;
           }
+          
           return false;
         }
 
         function calculateAccuracy() {
-          gameState.accuracyPoints = 0;
-          gameState.totalPossiblePoints = 0;
-          gameState.segmentsVisited = new Set();
-          gameState.visitedInOrder = [];
+          // Calculate percentage based on number of circuit segments touched
+          const totalSegments = gameState.circuitPath.length - 1;
+          const touchedSegments = gameState.allSegmentsTouched.size;
           
-          if (gameState.userPath.length < 10) {
-            gameState.accuracy = 0;
+          // If the user path is too short, accuracy is very low but not zero
+          if (gameState.userPath.length < 5) {
+            gameState.accuracy = 5; // Minimum accuracy score
             document.getElementById("accuracyResult").textContent = gameState.accuracy;
             return;
           }
 
-          const checkpointSegments = [];
-          const totalSegments = gameState.circuitPath.length - 1;
-          const segmentsPerCheckpoint = Math.max(1, Math.floor(totalSegments / 8));
-          for (let i = 0; i < totalSegments; i += segmentsPerCheckpoint) {
-            checkpointSegments.push(i);
-          }
-          if (checkpointSegments[checkpointSegments.length - 1] !== totalSegments - 1) {
-            checkpointSegments.push(totalSegments - 1);
-          }
+          // Calculate raw coverage
+          const rawCoverage = touchedSegments / totalSegments;
+          
+          // Convert coverage to percentage with adjusted weighting
+          // This rewards touching more of the circuit
+          const coverageScore = rawCoverage * 100;
+          
+          // Final accuracy calculation
+          gameState.accuracy = Math.round(coverageScore);
+          
+          // Ensure accuracy is between 5 and 100
+          gameState.accuracy = Math.max(5, Math.min(100, gameState.accuracy));
 
-          const samplingRate = Math.max(1, Math.floor(gameState.userPath.length / 100));
-          let onTrackPoints = 0;
-          let totalPoints = 0;
-          let lastVisitedSegmentIndex = -1;
-
-          for (let i = 0; i < gameState.userPath.length; i += samplingRate) {
-            const point = gameState.userPath[i];
-            totalPoints++;
-            let minDist = Infinity;
-            let closestSegmentIndex = -1;
-            for (let j = 0; j < gameState.circuitPath.length - 1; j++) {
-              const p1 = gameState.circuitPath[j];
-              const p2 = gameState.circuitPath[j + 1];
-              const closest = closestPointOnSegment(point, p1, p2);
-              const dist = distanceBetween(point, closest);
-              if (dist < minDist) {
-                minDist = dist;
-                closestSegmentIndex = j;
-              }
-            }
-            const onTrack = minDist <= gameState.pathWidth;
-            if (onTrack) {
-              onTrackPoints++;
-              gameState.accuracyPoints++;
-              gameState.segmentsVisited.add(closestSegmentIndex);
-              if (closestSegmentIndex !== lastVisitedSegmentIndex) {
-                gameState.visitedInOrder.push(closestSegmentIndex);
-                lastVisitedSegmentIndex = closestSegmentIndex;
-              }
-            }
-            gameState.totalPossiblePoints++;
-          }
-
-          const completedSegments = gameState.segmentsVisited.size;
-          const completionRatio = completedSegments / (gameState.circuitPath.length - 1);
-          let allCheckpointsVisited = true;
-          let checkpointsVisitedCount = 0;
-          for (const checkpointIndex of checkpointSegments) {
-            if (gameState.segmentsVisited.has(checkpointIndex)) {
-              checkpointsVisitedCount++;
-            } else {
-              allCheckpointsVisited = false;
-            }
-          }
-          const checkpointRatio = checkpointsVisitedCount / checkpointSegments.length;
-
-          let orderScore = 1.0;
-          if (gameState.visitedInOrder.length > 5) {
-            let sequentialSegments = 0;
-            let outOfOrderSegments = 0;
-            for (let i = 1; i < gameState.visitedInOrder.length - 1; i++) {
-              const prev = gameState.visitedInOrder[i-1];
-              const curr = gameState.visitedInOrder[i];
-              const next = gameState.visitedInOrder[i+1];
-              if ((curr > prev && next >= curr) || (curr < prev && next <= curr) ||
-                  (Math.abs(curr - prev) <= 2 && Math.abs(next - curr) <= 2)) {
-                sequentialSegments++;
-              } else {
-                outOfOrderSegments++;
-              }
-            }
-            const totalSegmentsChecked = sequentialSegments + outOfOrderSegments;
-            if (totalSegmentsChecked > 0) {
-              orderScore = sequentialSegments / totalSegmentsChecked;
-              orderScore = Math.max(0.3, orderScore);
-            }
-          }
-
-          const rawAccuracy = gameState.accuracyPoints / Math.max(1, gameState.totalPossiblePoints);
-          let coverageScore;
-          if (gameState.fullLoopRequired) {
-            if (checkpointRatio >= 0.8) {
-              coverageScore = (checkpointRatio * 0.7) + (completionRatio * 0.3);
-            } else {
-              coverageScore = checkpointRatio * 0.9;
-            }
-          } else {
-            coverageScore = (checkpointRatio * 0.5) + (completionRatio * 0.5);
-          }
-          if (completionRatio < gameState.minCircuitCoverage) {
-            coverageScore *= (completionRatio / gameState.minCircuitCoverage);
-          }
-          const finalScore = (rawAccuracy * 0.5) + (coverageScore * 0.3) + (orderScore * 0.2);
-          gameState.accuracy = Math.round(finalScore * 100);
-          gameState.accuracy = Math.max(0, Math.min(100, gameState.accuracy));
+          // Update UI immediately
           document.getElementById("accuracyResult").textContent = gameState.accuracy;
         }
 
-        function resamplePath(path, numPoints) {
-          if (path.length <= 1) return path;
-          const result = [path[0]];
-          const totalLength = pathLength(path);
-          const segmentLength = totalLength / (numPoints - 1);
-          let currentDist = 0;
-          let currentSegment = 0;
-          for (let i = 1; i < numPoints - 1; i++) {
-            const targetDist = i * segmentLength;
-            while (currentDist + segmentDistance(path[currentSegment], path[currentSegment + 1]) < targetDist) {
-              currentDist += segmentDistance(path[currentSegment], path[currentSegment + 1]);
-              currentSegment++;
-            }
-            const segDist = targetDist - currentDist;
-            const segTotalDist = segmentDistance(path[currentSegment], path[currentSegment + 1]);
-            const t = segDist / segTotalDist;
-            result.push({
-              x: path[currentSegment].x + t * (path[currentSegment + 1].x - path[currentSegment].x),
-              y: path[currentSegment].y + t * (path[currentSegment + 1].y - path[currentSegment].y),
-            });
-          }
-          result.push(path[path.length - 1]);
-          return result;
-        }
-
-        function pathLength(path) {
-          let length = 0;
-          for (let i = 1; i < path.length; i++) {
-            length += segmentDistance(path[i - 1], path[i]);
-          }
-          return length;
-        }
-
-        function segmentDistance(p1, p2) {
-          const dx = p2.x - p1.x;
-          const dy = p2.y - p1.y;
-          return Math.sqrt(dx * dx + dy * dy);
-        }
-
-        function showTouchFeedback(x, y) {}
-
         function handleStart(e) {
           e.preventDefault();
+          
+          // Don't allow drawing if circuit is completed
+          if (gameState.circuitCompleted) return;
+          
           const pos = getEventPosition(e);
           gameState.touchActive = true;
           gameState.lastTouchTime = Date.now();
@@ -1069,31 +1076,51 @@
             if (distance < gameState.startRadius * 4) {
               gameState.isDrawing = true;
               gameState.status = "playing";
+              gameState.gameStartTime = Date.now();
               gameState.userPath = [{ x: gameState.startPoint.x, y: gameState.startPoint.y }];
               gameState.lastPoint = { x: gameState.startPoint.x, y: gameState.startPoint.y };
-              gameState.segmentsVisited = new Set();
+              
+              // Reset segment tracking
+              gameState.touchedSegments = new Set();
+              gameState.allSegmentsTouched = new Set(); // Track all segments
               gameState.visitedInOrder = [];
               gameState.lastCheckpointIndex = -1;
+              
               document.getElementById("startPoint").style.opacity = "0";
               document.getElementById("startArrow").style.opacity = "0";
+              
               if (gameState.startTooltip && document.body.contains(gameState.startTooltip)) {
                 document.body.removeChild(gameState.startTooltip);
               }
+              
               drawCircuit();
               drawUserPath();
             }
           } else if (gameState.status === "playing" && !gameState.isDrawing) {
+            // Continue drawing from where user is touching now (don't connect with previous point)
             gameState.isDrawing = true;
-            if (gameState.lastPoint) {
-              gameState.userPath.push({ x: pos.x, y: pos.y });
-              gameState.lastPoint = { x: pos.x, y: pos.y };
-            }
+            gameState.isNewSegment = true;
+            
+            // Track that we've just resumed drawing
+            gameState.justResumedDrawing = true;
+            gameState.distanceSinceResume = 0;
+            gameState.resumePoint = { x: pos.x, y: pos.y };
+            
+            // Start a new segment at touch point instead of connecting with last point
+            gameState.lastPoint = { x: pos.x, y: pos.y };
+            gameState.userPath.push({ x: pos.x, y: pos.y });
+            
+            drawCircuit();
+            drawUserPath();
           }
         }
 
         function handleMove(e) {
           e.preventDefault();
+          
+          if (gameState.circuitCompleted) return;
           if (!gameState.isDrawing) return;
+          
           const pos = getEventPosition(e);
           gameState.touchActive = true;
           gameState.lastTouchTime = Date.now();
@@ -1109,42 +1136,105 @@
           if (addPoint) {
             if (gameState.lastPoint) {
               const dist = distanceBetween(pos, gameState.lastPoint);
+              
+              // Track distance moved since resuming drawing
+              if (gameState.justResumedDrawing && gameState.resumePoint) {
+                const distanceFromResume = distanceBetween(pos, gameState.resumePoint);
+                gameState.distanceSinceResume = distanceFromResume;
+                
+                // If moved enough, stop flagging as just resumed
+                if (distanceFromResume > gameState.minDistanceAfterResume) {
+                  gameState.justResumedDrawing = false;
+                }
+              }
+              
               if (dist > 10) {
                 const interpolated = interpolatePoints(gameState.lastPoint, pos, gameState.interpolationPoints);
+                
                 for (let i = 1; i < interpolated.length; i++) {
                   gameState.userPath.push(interpolated[i]);
+                  
+                  // Check if point is on ANY circuit segment and track it
+                  const closestInfo = findClosestPointOnPath(interpolated[i]);
+                  if (closestInfo.distance <= gameState.pathWidth) {
+                    // Track visible segments for UI feedback
+                    if (gameState.segmentVisibility[closestInfo.segmentIndex] === 1) {
+                      gameState.touchedSegments.add(closestInfo.segmentIndex);
+                    }
+                    // Track ALL segments (visible and invisible) for accuracy
+                    gameState.allSegmentsTouched.add(closestInfo.segmentIndex);
+                  }
                 }
               } else {
                 gameState.userPath.push({ x: pos.x, y: pos.y });
+                
+                // Check if point is on ANY circuit segment and track it
+                const closestInfo = findClosestPointOnPath(pos);
+                if (closestInfo.distance <= gameState.pathWidth) {
+                  // Track visible segments for UI feedback
+                  if (gameState.segmentVisibility[closestInfo.segmentIndex] === 1) {
+                    gameState.touchedSegments.add(closestInfo.segmentIndex);
+                  }
+                  // Track ALL segments for accuracy
+                  gameState.allSegmentsTouched.add(closestInfo.segmentIndex);
+                }
               }
             } else {
               gameState.userPath.push({ x: pos.x, y: pos.y });
             }
+            
             gameState.lastPoint = { x: pos.x, y: pos.y };
+            gameState.isNewSegment = false;
 
             if (!gameState.redrawScheduled) {
               gameState.redrawScheduled = true;
-              setTimeout(() => {
+              requestAnimationFrame(() => {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 drawCircuit();
                 drawUserPath();
                 gameState.redrawScheduled = false;
-              }, 10);
+              });
             }
 
-            if (checkCompletion()) {
-              gameState.isDrawing = false;
-              gameState.status = "completed";
-              showResultScreen();
+            // Only check for completion if we're not just resuming drawing
+            if (!gameState.justResumedDrawing) {
+              checkCompletion();
             }
           }
         }
 
         function handleEnd(e) {
           e.preventDefault();
+          
           if (gameState.isDrawing) {
             gameState.isDrawing = false;
             gameState.touchActive = false;
+            
+            // Reset the resumed drawing flag when lifting finger
+            gameState.justResumedDrawing = false;
+            
+            // Check for completion when lifting finger if enabled
+            if (gameState.checkCompletionOnLift && 
+                gameState.allSegmentsTouched.size > 0) {
+              // Only check if we've covered enough of the circuit
+              const totalSegments = gameState.circuitPath.length - 1;
+              const touchedSegmentCount = gameState.allSegmentsTouched.size;
+              const segmentPercentage = touchedSegmentCount / totalSegments;
+              
+              if (segmentPercentage >= gameState.minCircuitCoverage) {
+                // Check if we're near end point
+                const lastPoint = gameState.userPath[gameState.userPath.length - 1];
+                const endPoint = gameState.circuitPath[gameState.circuitPath.length - 1];
+                const dx = lastPoint.x - endPoint.x;
+                const dy = lastPoint.y - endPoint.y;
+                const distanceToEnd = Math.sqrt(dx * dx + dy * dy);
+                
+                // Only force completion check if near end point
+                if (distanceToEnd < gameState.completionThreshold * 2) {
+                  checkCompletion(true); // Force check on finger lift near end point
+                }
+              }
+            }
           }
         }
 
@@ -1220,72 +1310,89 @@
         }
 
         function showShareModal() {
-          generateScoreCard()
-            .then(imageUrl => {
-              document.getElementById("shareImage").src = imageUrl;
-              document.getElementById("shareModal").style.display = "flex";
-            })
-            .catch(error => {
-              console.error("Failed to generate score card:", error);
-              alert("Failed to generate score card for sharing.");
-            });
+          document.getElementById("shareImage").style.display = "none";
+          const loadingMsg = document.createElement("p");
+          loadingMsg.className = "share-loading";
+          loadingMsg.textContent = "Loading...";
+          document.querySelector(".share-content").insertBefore(loadingMsg, document.getElementById("universalShareButton"));
+          
+          document.getElementById("shareModal").style.display = "flex";
+          
+          // Use a timeout to let the modal appear before generating the image
+          setTimeout(() => {
+            generateScoreCard()
+              .then(imageUrl => {
+                // Remove loading message
+                if (loadingMsg.parentNode) {
+                  loadingMsg.parentNode.removeChild(loadingMsg);
+                }
+                
+                const shareImage = document.getElementById("shareImage");
+                shareImage.src = imageUrl;
+                shareImage.style.display = "block";
+              })
+              .catch(error => {
+                console.error("Failed to generate score card:", error);
+                if (loadingMsg.parentNode) {
+                  loadingMsg.textContent = "Failed to generate score card";
+                }
+              });
+          }, 100);
         }
 
         function shareResult() {
           showShareModal();
         }
 
-        function shareToSocialMedia(platform) {
+        function shareToSocialMedia() {
           const imageUrl = document.getElementById("shareImage").src;
           const shareText = `I completed the Finger Circuit with ${gameState.accuracy}% accuracy!`;
           
-          switch (platform) {
-            case 'twitter':
-              window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&hashtags=FingerCircuit`, '_blank');
-              break;
-            case 'instagram':
-              // For Instagram, we need to download the image first since direct sharing isn't supported
-              // Show instructions for Instagram sharing
-              alert('To share on Instagram: 1. Save the image 2. Open Instagram 3. Create a new post with this image');
-              // Automatically trigger download
-              const link = document.createElement('a');
-              link.href = imageUrl;
-              link.download = 'finger-circuit-score.png';
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-              break;
-            case 'line':
-              window.open(`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(shareText)}`, '_blank');
-              break;
-            case 'download':
-              const downloadLink = document.createElement('a');
-              downloadLink.href = imageUrl;
-              downloadLink.download = 'finger-circuit-score.png';
-              document.body.appendChild(downloadLink);
-              downloadLink.click();
-              document.body.removeChild(downloadLink);
-              break;
-            default:
-              // Use Web Share API if available (modern mobile browsers)
-              if (navigator.share) {
-                fetch(imageUrl)
-                  .then(res => res.blob())
-                  .then(blob => {
-                    const file = new File([blob], "finger-circuit-score.png", { type: "image/png" });
+          // Use Web Share API with error handling
+          if (imageUrl) {
+            fetch(imageUrl)
+              .then(res => res.blob())
+              .then(blob => {
+                const file = new File([blob], "finger-circuit-score.png", { type: "image/png" });
+                
+                if (navigator.share) {
+                  navigator.share({
+                    title: "My Finger Circuit Result",
+                    text: shareText,
+                    files: [file]
+                  }).catch(error => {
+                    console.error("Error sharing:", error);
+                    // Fallback for browsers that support share API but not file sharing
                     navigator.share({
                       title: "My Finger Circuit Result",
                       text: shareText,
-                      files: [file]
-                    }).catch(error => {
-                      console.error("Error sharing:", error);
+                      url: window.location.href
+                    }).catch(err => {
+                      console.error("Error in fallback share:", err);
+                      downloadImage(imageUrl);
                     });
                   });
-              } else {
-                alert(`You completed the circuit with ${gameState.accuracy}% accuracy! Screenshot to share.`);
-              }
+                } else {
+                  // Fallback for browsers that don't support Web Share API
+                  downloadImage(imageUrl);
+                }
+              })
+              .catch(error => {
+                console.error("Error processing image:", error);
+                alert("Couldn't process image for sharing. Please try again.");
+              });
           }
-          document.getElementById("shareModal").style.display = "none";
+        }
+
+        function downloadImage(imageUrl) {
+          const downloadLink = document.createElement('a');
+          downloadLink.href = imageUrl;
+          downloadLink.download = 'finger-circuit-score.png';
+          document.body.appendChild(downloadLink);
+          downloadLink.click();
+          document.body.removeChild(downloadLink);
+          
+          alert("Image saved. You can share it manually.");
         }
 
         function returnToMap() {
@@ -1293,20 +1400,39 @@
         }
 
         function resetGame() {
+          // Reset game state
           gameState.status = "initializing";
           gameState.userPath = [];
+          gameState.lastPoint = null;
           gameState.isDrawing = false;
+          gameState.circuitCompleted = false;
+          gameState.calculatingAccuracy = false;
+          gameState.touchedSegments = new Set();
+          gameState.allSegmentsTouched = new Set(); // Reset all segments tracking
+          gameState.visitedInOrder = [];
+          gameState.justResumedDrawing = false;
+          gameState.distanceSinceResume = 0;
+          gameState.resumePoint = null;
+          
+          // Hide result screen
           document.getElementById("resultScreen").style.display = "none";
+          
+          // Show start elements
           document.getElementById("startPoint").style.opacity = "1";
           document.getElementById("startArrow").style.opacity = "1";
+          
+          // Clear canvas
           ctx.clearRect(0, 0, canvas.width, canvas.height);
           drawCircuit();
+          
+          // Show intro animation
           const whiteBelt = document.getElementById("whiteBelt");
           const missionBanner = document.querySelector(".mission-banner");
           whiteBelt.style.display = "flex";
           whiteBelt.style.opacity = "1";
           missionBanner.style.display = "block";
           missionBanner.style.opacity = "1";
+          
           setTimeout(function () {
             whiteBelt.style.opacity = "0";
             setTimeout(function () {
@@ -1323,16 +1449,20 @@
         }
 
         function initGame() {
-          console.log("Starting game initialization...");
           try {
+            // Initialize canvas and circuit
+            resizeCanvas();
             initializeCircuitPath();
             drawCircuit();
+            
+            // Show intro animation
             const whiteBelt = document.getElementById("whiteBelt");
             const missionBanner = document.querySelector(".mission-banner");
             whiteBelt.style.display = "flex";
             whiteBelt.style.opacity = "1";
             missionBanner.style.opacity = "1";
             gameState.status = "initializing";
+            
             setTimeout(function () {
               whiteBelt.style.opacity = "0";
               setTimeout(function () {
@@ -1347,6 +1477,7 @@
               }, 500);
             }, 2000);
 
+            // Remove any existing event listeners to prevent duplicates
             canvas.removeEventListener("mousedown", handleStart);
             canvas.removeEventListener("mousemove", handleMove);
             canvas.removeEventListener("mouseup", handleEnd);
@@ -1354,6 +1485,7 @@
             canvas.removeEventListener("touchmove", handleMove);
             canvas.removeEventListener("touchend", handleEnd);
 
+            // Add event listeners with passive: false to prevent scrolling
             canvas.addEventListener("mousedown", handleStart, { passive: false });
             canvas.addEventListener("mousemove", handleMove, { passive: false });
             canvas.addEventListener("mouseup", handleEnd, { passive: false });
@@ -1361,15 +1493,19 @@
             canvas.addEventListener("touchmove", handleMove, { passive: false });
             canvas.addEventListener("touchend", handleEnd, { passive: false });
 
+            // Add button event listeners
             document.getElementById("retryButton").addEventListener("click", resetGame);
             document.getElementById("shareButton").addEventListener("click", shareResult);
             document.getElementById("mapButton").addEventListener("click", returnToMap);
-            document.querySelectorAll(".share-platform").forEach(element => {
-              element.addEventListener("click", function() {
-                const platform = this.getAttribute("data-platform");
-                shareToSocialMedia(platform);
-              });
+            
+            // Removed share platform event listeners
+            
+            // Keep universal share button event listener
+            document.getElementById("universalShareButton").addEventListener("click", function() {
+              shareToSocialMedia();
             });
+            
+            // Add close share modal event listener
             document.getElementById("closeShare").addEventListener("click", function() {
               document.getElementById("shareModal").style.display = "none";
             });
@@ -1378,6 +1514,7 @@
           }
         }
 
+        // Start the game
         resizeCanvas();
         initGame();
       });
