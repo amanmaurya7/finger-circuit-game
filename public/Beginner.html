@@ -1068,75 +1068,24 @@
           if (gameState.circuitCompleted || gameState.calculatingAccuracy) return false;
           
           // Need a minimum path length
-          if (gameState.userPath.length < 5) return false; // Reduced minimum path length
+          if (gameState.userPath.length < 5) return false;
           
           // Need minimum play time before allowing completion check
-          if (!forceCheck && Date.now() - gameState.gameStartTime < 1000) return false; // Reduced minimum play time
+          if (!forceCheck && Date.now() - gameState.gameStartTime < 500) return false;
           
-          // Skip completion check if we just resumed drawing and haven't moved enough
-          if (gameState.justResumedDrawing && gameState.distanceSinceResume < gameState.minDistanceAfterResume) {
-            return false;
-          }
-
           const lastPoint = gameState.userPath[gameState.userPath.length - 1];
           
-          // Check if near start point
-          const dxStart = lastPoint.x - gameState.startPoint.x;
-          const dyStart = lastPoint.y - gameState.startPoint.y;
-          const distanceToStart = Math.sqrt(dxStart * dxStart + dyStart * dyStart);
-          
-          // Check if near end point (which is the same as start point in a circuit)
+          // ONLY check if exactly at END POINT with very strict threshold
           const endPoint = gameState.circuitPath[gameState.circuitPath.length - 1];
           const dxEnd = lastPoint.x - endPoint.x;
           const dyEnd = lastPoint.y - endPoint.y;
           const distanceToEnd = Math.sqrt(dxEnd * dxEnd + dyEnd * dyEnd);
-
-          // Calculate total distance traveled
-          let totalDistance = 0;
-          for (let i = 1; i < gameState.userPath.length; i++) {
-            const prev = gameState.userPath[i-1];
-            const curr = gameState.userPath[i];
-            totalDistance += distanceBetween(prev, curr);
-          }
-
-          // Calculate the length of the ideal circuit path
-          let circuitLength = 0;
-          for (let i = 1; i < gameState.circuitPath.length; i++) {
-            circuitLength += distanceBetween(
-              gameState.circuitPath[i-1],
-              gameState.circuitPath[i]
-            );
-          }
-
-          // Calculate percentage of segments visited
-          const totalSegments = gameState.circuitPath.length - 1;
-          const touchedSegmentCount = gameState.allSegmentsTouched.size;
-          const segmentPercentage = touchedSegmentCount / totalSegments;
           
-          // Check completion conditions
-          let isCompleted = false;
+          // Make the completion threshold much smaller to require direct touching
+          const strictTouchThreshold = 15; // Smaller radius for exact touch detection
           
-          // Condition 1: Near start/end point - no minimum coverage required
-          if (distanceToStart < gameState.completionThreshold * 3 || 
-              distanceToEnd < gameState.completionThreshold * 3) {
-            isCompleted = true;
-          }
-          
-          // Condition 2: Only check on explicit force check (lifting finger)
-          if (forceCheck) {
-            // Only if we're near the end point
-            if (distanceToEnd < gameState.completionThreshold * 4) {
-              isCompleted = true;
-            }
-          }
-          
-          // Condition 3: Quick completion with larger detection radius
-          if (gameState.quickCompletionEnabled && 
-              distanceToEnd < gameState.quickCompletionThreshold * 2) {
-            isCompleted = true;
-          }
-          
-          if (isCompleted) {
+          // ONLY complete if very precisely touching the end point
+          if (distanceToEnd < strictTouchThreshold) {
             // Set circuit as completed to prevent further drawing
             gameState.circuitCompleted = true;
             gameState.calculatingAccuracy = true;
@@ -1387,37 +1336,15 @@
           e.preventDefault();
 
           // If lifted finger, just stop drawing until next touch
-          // but maintain "playing" state so user can continue
           if (gameState.isDrawing) {
             gameState.isDrawing = false;
-            // Update touch state
             gameState.touchActive = false;
             
             // Reset the resumed drawing flag when lifting finger
             gameState.justResumedDrawing = false;
             
-            // Check for completion when lifting finger if enabled
-            if (gameState.checkCompletionOnLift && 
-                gameState.allSegmentsTouched.size > 0) {
-              // Only check if we've covered enough of the circuit
-              const totalSegments = gameState.circuitPath.length - 1;
-              const touchedSegmentCount = gameState.allSegmentsTouched.size;
-              const segmentPercentage = touchedSegmentCount / totalSegments;
-              
-              if (segmentPercentage >= gameState.minCircuitCoverage) {
-                // Check if we're near end point
-                const lastPoint = gameState.userPath[gameState.userPath.length - 1];
-                const endPoint = gameState.circuitPath[gameState.circuitPath.length - 1];
-                const dx = lastPoint.x - endPoint.x;
-                const dy = lastPoint.y - endPoint.y;
-                const distanceToEnd = Math.sqrt(dx * dx + dy * dy);
-                
-                // Only force completion check if near end point
-                if (distanceToEnd < gameState.completionThreshold * 2) {
-                  checkCompletion(true); // Force check on finger lift near end point
-                }
-              }
-            }
+            // DO NOT check for completion when lifting finger
+            // This ensures we only complete when actively touching the end point
           }
         }
 
@@ -1652,12 +1579,12 @@
             missionBanner.style.opacity = "1";
             gameState.status = "initializing";
             
-            // Update game state with more lenient parameters
-            gameState.minCircuitCoverage = 0.1;           // Reduce minimum circuit coverage required
-            gameState.completionThreshold = 40;           // Increase completion threshold radius
-            gameState.quickCompletionThreshold = 40;      // Increase quick completion threshold
-            gameState.minPlayTime = 1000;                 // Reduce minimum play time
-            gameState.allowPartialCompletion = true;      // Always allow partial completion
+            // Update game state with strict endpoint touch detection
+            gameState.minCircuitCoverage = 0.0;           // No minimum circuit coverage required
+            gameState.completionThreshold = 15;           // Much smaller end point detection radius
+            gameState.quickCompletionEnabled = false;     // Disable quick completion
+            gameState.checkCompletionOnLift = false;      // Disable completion check on finger lift
+            gameState.minPlayTime = 500;                  // Short minimum play time
             
             setTimeout(function () {
               whiteBelt.style.opacity = "0";
