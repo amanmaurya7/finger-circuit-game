@@ -336,6 +336,21 @@
         animation: pulse 2s infinite;
       }
 
+      /* Add continuation circle styles */
+      .continuation-circle {
+        position: fixed; /* Change to fixed positioning */
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        border: 2px solid rgba(0, 80, 255, 0.8);
+        background-color: rgba(0, 80, 255, 0.1);
+        pointer-events: none;
+        transform: translate(-50%, -50%);
+        z-index: 1000; /* Ensure circle is always visible */
+        display: none;
+        animation: pulse 2s infinite;
+      }
+
       .share-modal {
         position: fixed;
         top: 0;
@@ -522,6 +537,9 @@
       <div id="whiteBelt" class="white-belt"></div>
 
       <div id="touchIndicator" class="touch-indicator"></div>
+      
+      <!-- Add continuation circle element -->
+      <div id="continuationCircle" class="continuation-circle"></div>
 
       <div id="resultScreen" class="result-screen">
         <div class="result-modal">
@@ -587,6 +605,7 @@
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
         const touchIndicator = document.getElementById("touchIndicator");
+        const continuationCircle = document.getElementById("continuationCircle"); // Add reference to continuation circle
 
         // Game state and variables
         const gameState = {
@@ -656,7 +675,13 @@
           resumePoint: null,
           
           // Prevent accidental quick completions
-          quickCompletionThreshold: 15
+          quickCompletionThreshold: 15,
+          
+          // Continuation circle radius (approx 1cm)
+          continuationRadius: 20, // 20px radius = 40px diameter, ~1cm
+          
+          // Store the last point where the finger was lifted
+          lastLiftPoint: null
         };
 
         // Set canvas size
@@ -1212,22 +1237,38 @@
           } 
           // Check if we're already playing but not currently drawing (we lifted finger before)
           else if (gameState.status === "playing" && !gameState.isDrawing) {
-            // Add the current touch point to continue drawing
-            gameState.isDrawing = true;
-            gameState.isNewSegment = true;
+            // Get canvas position
+            const canvasRect = canvas.getBoundingClientRect();
             
-            // Track that we've just resumed drawing
-            gameState.justResumedDrawing = true;
-            gameState.distanceSinceResume = 0;
-            gameState.resumePoint = { x: pos.x, y: pos.y };
+            // Convert touch position to be relative to viewport
+            const touchX = pos.x + canvasRect.left;
+            const touchY = pos.y + canvasRect.top;
             
-            // Start a new segment at touch point instead of connecting with last point
-            gameState.lastPoint = { x: pos.x, y: pos.y };
-            gameState.userPath.push({ x: pos.x, y: pos.y });
+            // Check if touching within the continuation circle
+            const canContinue = gameState.lastLiftPoint && 
+                               Math.hypot(touchX - gameState.lastLiftPoint.x, 
+                                        touchY - gameState.lastLiftPoint.y) <= gameState.continuationRadius;
             
-            // Force redraw
-            drawCircuit();
-            drawUserPath();
+            if (canContinue) {
+              // Continue drawing from current touch point
+              gameState.isDrawing = true;
+              gameState.isNewSegment = true;
+              
+              // Hide continuation circle
+              continuationCircle.style.display = "none";
+              
+              // Track that we've just resumed drawing
+              gameState.justResumedDrawing = true;
+              gameState.distanceSinceResume = 0;
+              gameState.resumePoint = { x: pos.x, y: pos.y };
+              
+              // Start a new segment at touch point
+              gameState.lastPoint = { x: pos.x, y: pos.y };
+              gameState.userPath.push({ x: pos.x, y: pos.y });
+              
+              drawCircuit();
+              drawUserPath();
+            }
           }
         }
 
@@ -1333,23 +1374,39 @@
         }
 
         function handleEnd(e) {
-          e.preventDefault();
+  e.preventDefault();
 
-          // If lifted finger, just stop drawing until next touch
-          if (gameState.isDrawing) {
-            gameState.isDrawing = false;
-            gameState.touchActive = false;
-            
-            // Reset the resumed drawing flag when lifting finger
-            gameState.justResumedDrawing = false;
-            
-            // DO NOT check for completion when lifting finger
-            // This ensures we only complete when actively touching the end point
-          }
-        }
+  if (gameState.isDrawing) {
+    gameState.isDrawing = false;
+    gameState.touchActive = false;
+    
+    // Store the last point where finger was lifted
+    if (gameState.lastPoint && !gameState.circuitCompleted) {
+      // Get canvas position
+      const canvasRect = canvas.getBoundingClientRect();
+      
+      // Calculate position relative to viewport, centered on the line endpoint
+      const x = gameState.lastPoint.x + canvasRect.left;
+      const y = gameState.lastPoint.y + canvasRect.top;
+      
+      // Store the last lift point
+      gameState.lastLiftPoint = { x, y };
+      
+      // Show continuation circle at the exact lift point
+      continuationCircle.style.display = "block";
+      continuationCircle.style.position = "fixed";
+      // Center the circle by offsetting by its radius (20px)
+      continuationCircle.style.left = (x - 20) + "px";
+      continuationCircle.style.top = (y - 20) + "px";
+    }
+    
+    gameState.justResumedDrawing = false;
+  }
+}
 
         function getEventPosition(e) {
           let x, y;
+          const rect = canvas.getBoundingClientRect();
 
           try {
             if (e.type.includes("touch")) {
@@ -1358,20 +1415,21 @@
                 console.error("No touch found in event:", e);
                 return { x: 0, y: 0 };
               }
-
-              const rect = canvas.getBoundingClientRect();
               x = touch.clientX - rect.left;
               y = touch.clientY - rect.top;
             } else {
-              const rect = canvas.getBoundingClientRect();
               x = e.clientX - rect.left;
               y = e.clientY - rect.top;
             }
 
+            // Scale coordinates if canvas is scaled
+            x *= canvas.width / rect.width;
+            y *= canvas.height / rect.height;
+
             return { x, y };
           } catch (error) {
             console.error("Error in getEventPosition:", error);
-            return { x: 0, y: 0 }; // Return default position in case of error
+            return { x: 0, y: 0 };
           }
         }
 
@@ -1520,6 +1578,7 @@
           gameState.status = "initializing";
           gameState.userPath = [];
           gameState.lastPoint = null;
+          gameState.lastLiftPoint = null; // Reset last lift point
           gameState.isDrawing = false;
           gameState.circuitCompleted = false;
           gameState.calculatingAccuracy = false;
@@ -1529,6 +1588,9 @@
           gameState.justResumedDrawing = false;
           gameState.distanceSinceResume = 0;
           gameState.resumePoint = null;
+          
+          // Hide continuation circle
+          continuationCircle.style.display = "none";
           
           // Hide result screen
           document.getElementById("resultScreen").style.display = "none";
@@ -1563,6 +1625,8 @@
             }, 500);
           }, 2000);
         }
+
+        
 
         function initGame() {
           try {
@@ -1630,6 +1694,15 @@
             document.getElementById("closeShare").addEventListener("click", function() {
               document.getElementById("shareModal").style.display = "none";
             });
+
+            // Add window scroll event listener to update circle position
+            window.addEventListener('scroll', function() {
+  if (gameState.lastLiftPoint && continuationCircle.style.display === "block") {
+    // Adjust for scroll position while maintaining center alignment
+    continuationCircle.style.left = (gameState.lastLiftPoint.x - 20 - window.scrollX) + "px";
+    continuationCircle.style.top = (gameState.lastLiftPoint.y - 20 - window.scrollY) + "px";
+  }
+});
           } catch (error) {
             console.error("Error during game initialization:", error);
           }
@@ -1641,3 +1714,4 @@
     </script>
   </body>
 </html>
+
