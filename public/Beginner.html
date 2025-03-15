@@ -348,7 +348,13 @@
         transform: translate(-50%, -50%);
         z-index: 1000; /* Ensure circle is always visible */
         display: none;
-        animation: pulse 2s infinite;
+        animation: blink 1.5s infinite;
+      }
+
+      @keyframes blink {
+        0% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.3; transform: scale(0.92); }
+        100% { opacity: 1; transform: scale(1); }
       }
 
       .share-modal {
