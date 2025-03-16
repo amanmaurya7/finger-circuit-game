@@ -6,13 +6,20 @@
     <title>Finger Circuit</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap" rel="stylesheet">
     <style>
+         @font-face {
+            font-family: 'MyCustomFont'; /* You can name this anything you like */
+            src: url('./assets/display-regular.ttf') format('truetype'); /* Path to your .ttf file */
+            font-weight: normal; /* Optional: specify weight */
+            font-style: normal; /* Optional: specify style */
+            }
+
         body {
             margin: 0;
             padding: 0;
             overflow: hidden;
-            font-family: 'Noto Sans', sans-serif;
+            font-family: 'MyCustomFont', sans-serif;
         }
-        
+      
         .game-container {
             position: relative;
             width: 100%;
@@ -93,6 +100,7 @@
         
         .mode-buttons {
             display: flex;
+            font-family: 'MyCustomFont', sans-serif;
             flex-direction: column;
             gap: 10px;
             width: 80%;
@@ -106,6 +114,7 @@
             border: 2px solid white;
             color: rgb(0, 0, 0);
             padding: 10px 15px;
+            font-family: 'MyCustomFont', sans-serif;
             font-size: 16px;
             border-radius: 30px;
             cursor: pointer;
