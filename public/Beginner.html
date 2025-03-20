@@ -54,7 +54,7 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        height: 70px;
+        height: 80px;
       }
 
       .title-banner h1 {
@@ -212,13 +212,12 @@
 
       .result-screen {
         position: fixed;
-        top: 70px; /* Match the height of the header */
+        top: 0px;
         left: 0;
         width: 100%;
         height: 100%;
-        height: calc(100% - 130px); /* Account for both header (70px) and footer (60px) */
-        background-color: rgba(0, 0, 0, 0.5); /* Lighter background to see through */
-        z-index: 20;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 5; /* Reduced z-index to be below title bar and nav */
         display: none;
         flex-direction: column;
         justify-content: center;
@@ -226,20 +225,6 @@
         text-align: center;
       }
 
-      .result-modal {
-        width: 100%;
-        max-width: 420px;
-        height: 100%;
-        background-color: rgba(69, 69, 69, 0.9); /* Semi-transparent background */
-        border-radius: 12px;
-        padding: 20px 15px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        position: relative;
-        overflow: hidden;
-        backdrop-filter: blur(0.5px); /* Add blur effect for better readability */
-      }
 
       .result-modal::before {
         content: "";
@@ -331,6 +316,7 @@
         background-color: white;
         color: #333;
         height: 45px;
+        width: 90%;
       }
 
       .touch-indicator {
