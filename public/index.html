@@ -16,17 +16,18 @@
         body {
             margin: 0;
             padding: 0;
-            overflow: hidden;
+            overflow-y: auto;
             font-family: 'MyCustomFont', sans-serif;
         }
       
         .game-container {
             position: relative;
             width: 100%;
-            height: 100vh;
+            min-height: 100vh;
             background: linear-gradient(to bottom, #ff69b4, white, #4169e1);
             display: flex;
             flex-direction: column;
+            overflow-y: auto;
         }
         
         .race-car {
@@ -87,15 +88,16 @@
         }
         
         .content-area {
-            position: absolute;
-            top: 70px;
-            bottom: 60px;
+            position: relative;
+            padding-top: 70px;
+            padding-bottom: 60px;
             width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 2;
+            min-height: calc(100vh - 130px);
         }
         
         .mode-buttons {
@@ -105,8 +107,8 @@
             gap: 10px;
             width: 80%;
             max-width: 300px;
-            margin-bottom: 20px;
-            margin-top: 380px;
+            margin-bottom: 30px;
+            margin-top: auto;
         }
         
         .mode-btn {
@@ -176,6 +178,7 @@
             align-items: center;
             justify-content: center;
             margin-top: 10px;
+            margin-bottom: 60px;
         }
         
         .logo img {
@@ -210,11 +213,12 @@
             }
             
             .content-area {
-                top: 60px;
+                padding-top: 60px;
             }
             
             .mode-buttons {
                 gap: 8px;
+                margin-top: 20px;
             }
             
             .mode-btn {
@@ -342,6 +346,25 @@
             
             .nav-icon span {
                 font-size: 8px;
+            }
+        }
+
+        @media (orientation: landscape) {
+            .content-area {
+                flex-direction: row;
+                justify-content: space-around;
+                align-items: center;
+                padding: 70px 20px 60px;
+            }
+            
+            .mode-buttons {
+                margin: 0;
+                width: 45%;
+            }
+            
+            .logo {
+                width: 45%;
+                margin: 0;
             }
         }
     </style>

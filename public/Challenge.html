@@ -280,7 +280,7 @@
       .completion-value {
         font-size: 160px;
         color: #ff6699;
-        text-shadow: 0 0 5px #ff6699, 0 0 15px #ff6699;
+        text-shadow: 0 0 2px #ff6699, 0 0 8px #ff6699;
         margin: 0;
         line-height: 1;
         display: flex;
@@ -296,7 +296,7 @@
         margin-top: 95px;
         margin-left: 25px;
         color: #ff6699;
-        text-shadow: 0 0 2px #ff6699;
+        text-shadow: 0 0 1px #ff6699;
       }
 
       .result-button {
@@ -422,8 +422,6 @@
         border: 1px solid #eee;
       }
       
-      /* Removed share-buttons, share-platform, and share-platform-icon styles */
-
       .close-share {
         position: absolute;
         top: 15px;
@@ -479,6 +477,72 @@
         color: #666;
         font-size: 14px;
         margin: 20px 0;
+      }
+
+      /* Hidden score element for sharing */
+      #scoreElement {
+        width: 320px;
+        height: 320px;
+        background-image: url("assets/SNS-bg.png");
+        background-size: cover;
+        background-position: center;
+        position: fixed;
+        left: -9999px;
+        top: -9999px;
+        opacity: 0;
+        z-index: -1;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+      }
+
+      .share-header {
+        margin-top: 60px;
+        text-align: center;
+      }
+
+      .share-game-title {
+        font-size: 28px;
+        color: #000;
+        margin-bottom: 10px;
+      }
+      .share-game-mode {
+        text-align: left;
+        display: inline-block;
+        background-color: white;
+        color: #000;
+        font-size: 14px;
+        padding: 4px 12px 4px 8px; /* Adjusted padding */
+        border-radius: 30px;
+        margin-bottom: 20px;
+        margin-left: 8px; /* Added left margin to move text left */
+        float: left; /* Added float left */
+      }
+
+      .share-score-label {
+        font-size: 18px;
+        text-align: left;
+        color: #fd6aa0;
+        margin-bottom: 5px;
+        margin-left: 50px; /* Added left margin to move text left */
+
+      }
+
+      .share-score-value {
+        font-size: 90px;
+        margin-left: 8px; /* Added left margin to move text left */
+        color: #fd6aa0;
+        line-height: 1;
+        margin-bottom: 10px;
+      }
+
+      .share-circuit {
+        position: absolute;
+        right: 20px;
+        top: 140px;
+        width: 120px;
+        height: 160px;
+        opacity: 0.7;
       }
 
       @keyframes pulse {
@@ -601,6 +665,24 @@
         </div>
       </div>
 
+      <!-- Hidden element for generating share image -->
+      <div id="scoreElement">
+        <div class="share-header">
+          <div class="share-game-title">FINGER CIRCUIT</div>
+          <div class="share-game-mode">CHALLENGE</div>
+        </div>
+        <div class="share-score-label">完成度</div>
+        <div class="share-score-value">
+          <span id="shareAccuracyValue"></span>
+          <span style="font-size: 30px;">%</span>
+        </div>
+        <canvas id="circuitCanvas" class="share-circuit"></canvas>
+      </div>
+
+       <!-- Social Share Modal -->
+         class="share-circuit"></canvas>
+      </div>
+
        <!-- Social Share Modal -->
        <div id="shareModal" class="share-modal">
         <div class="share-content">
@@ -632,14 +714,12 @@
     </a>
       <a href="#" class="nav-icon">
           <img src="./assets/menu.svg" alt="">
-            </svg> 
           <span>Menu</span>
       </a>
   </div>
 </div>
 
-
-
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         const canvas = document.getElementById("gameCanvas");
@@ -1122,6 +1202,9 @@
 
           // Update UI immediately
           document.getElementById("accuracyResult").textContent = gameState.accuracy;
+          
+          // Also update the share element's accuracy value
+          document.getElementById("shareAccuracyValue").textContent = gameState.accuracy;
         }
 
         function handleStart(e) {
@@ -1364,52 +1447,179 @@
           document.getElementById("resultScreen").style.display = "flex";
         }
 
-        function generateScoreCard() {
-          return new Promise((resolve, reject) => {
-            try {
-              const scoreCanvas = document.createElement("canvas");
-              const scoreCtx = scoreCanvas.getContext("2d");
-              scoreCanvas.width = 320;
-              scoreCanvas.height = 240;
-              scoreCtx.fillStyle = "#333";
-              scoreCtx.fillRect(0, 0, scoreCanvas.width, scoreCanvas.height);
-              scoreCtx.strokeStyle = "rgba(255, 255, 255, 0.1)";
-              scoreCtx.lineWidth = 1;
-              for (let i = 0; i < 5; i++) {
-                for (let j = 0; j < 5; j++) {
-                  scoreCtx.beginPath();
-                  scoreCtx.rect(i * 70, j * 60, 60, 50);
-                  scoreCtx.stroke();
+        // Prepare the share element with current game data
+        function prepareShareElement() {
+          // Update the share accuracy value
+          document.getElementById("shareAccuracyValue").textContent = gameState.accuracy;
+          
+          // Draw the circuit on the share canvas
+          const circuitCanvas = document.getElementById("circuitCanvas");
+          const circuitCtx = circuitCanvas.getContext("2d");
+          
+          // Set canvas size
+          circuitCanvas.width = 120;
+          circuitCanvas.height = 160;
+          
+          // Clear canvas
+          circuitCtx.clearRect(0, 0, circuitCanvas.width, circuitCanvas.height);
+          
+          // Scale factor to fit the circuit in the small canvas
+          const scaleX = circuitCanvas.width / canvas.width;
+          const scaleY = circuitCanvas.height / canvas.height;
+          
+          // Draw the circuit path (light gray)
+          circuitCtx.beginPath();
+          
+          // Draw the circuit guidelines
+          for (let i = 0; i < gameState.circuitPath.length - 1; i++) {
+           
+          }
+          
+          circuitCtx.strokeStyle = "rgba(100, 100, 100, 0.5)";
+          circuitCtx.lineWidth = 1;
+          circuitCtx.stroke();
+          
+          // Draw the user path (blue)
+          if (gameState.userPath.length > 1) {
+            // Draw each segment of the user path separately
+            let segments = [];
+            let currentSegment = [];
+            
+            // First point is always the start of a segment
+            currentSegment.push(gameState.userPath[0]);
+            
+            // Identify segments based on large distances (lifted finger)
+            for (let i = 1; i < gameState.userPath.length; i++) {
+              const prev = gameState.userPath[i-1];
+              const curr = gameState.userPath[i];
+              const distance = distanceBetween(prev, curr);
+              
+              // If distance is too large, it means the finger was lifted
+              if (distance > 30) {
+                if (currentSegment.length > 0) {
+                  segments.push([...currentSegment]);
+                  currentSegment = [];
                 }
               }
-              scoreCtx.fillStyle = "white";
-              scoreCtx.font = "14px 'MyCustomFont', sans-serif";
-              scoreCtx.textAlign = "center";
-              scoreCtx.fillText("ミッションクリア", scoreCanvas.width / 2, 40);
-              scoreCtx.font = "bold 24px 'MyCustomFont', sans-serif";
-              scoreCtx.fillText("MISSION CLEAR", scoreCanvas.width / 2, 70);
-              scoreCtx.font = "14px 'MyCustomFont', sans-serif";
-              scoreCtx.fillText("完成度", scoreCanvas.width / 2, 100);
-              scoreCtx.font = "bold 80px 'MyCustomFont', sans-serif";
-              scoreCtx.fillStyle = "#ff6699";
-              scoreCtx.shadowColor = "#ff6699";
-              scoreCtx.shadowBlur = 15;
-              scoreCtx.fillText(gameState.accuracy, scoreCanvas.width / 2 - 20, 170);
-              scoreCtx.font = "bold 24px 'MyCustomFont', sans-serif";
-              scoreCtx.fillText("%", scoreCanvas.width / 2 + 50, 170);
-              scoreCtx.shadowBlur = 0;
-              scoreCtx.fillStyle = "white";
-              scoreCtx.font = "12px 'MyCustomFont', sans-serif";
-              scoreCtx.fillText("FINGER CIRCUIT", scoreCanvas.width / 2, 210);
-              const dataUrl = scoreCanvas.toDataURL("image/png");
-              resolve(dataUrl);
-            } catch (error) {
-              reject(error);
+              
+              currentSegment.push(curr);
             }
+            
+            // Add the last segment
+            if (currentSegment.length > 0) {
+              segments.push(currentSegment);
+            }
+            
+            // Draw each segment
+            for (const segment of segments) {
+              if (segment.length < 2) continue;
+              
+              circuitCtx.beginPath();
+              circuitCtx.moveTo(segment[0].x * scaleX, segment[0].y * scaleY);
+              
+              for (let i = 1; i < segment.length; i++) {
+                circuitCtx.lineTo(segment[i].x * scaleX, segment[i].y * scaleY);
+              }
+              
+              circuitCtx.strokeStyle = "rgba(0, 0, 180, 0.9)";
+              circuitCtx.lineWidth = 2;
+              circuitCtx.stroke();
+            }
+          }
+          
+          // Use a small timeout to let the component render first
+          return new Promise((resolve) => {
+            setTimeout(() => {
+              resolve();
+            }, 100);
           });
         }
 
-        function showShareModal() {
+        // Generate the share image
+        async function generateScoreCard() {
+          const scoreElement = document.getElementById("scoreElement");
+          
+          // Make the element visible to html2canvas but still hidden to user
+          scoreElement.style.opacity = '1';
+          scoreElement.style.transform = 'none';
+          
+          try {
+            // Convert DOM element to canvas image
+            const canvas = await html2canvas(scoreElement, {
+              backgroundColor: null,
+              scale: 2, // Higher resolution
+              logging: false,
+              useCORS: true
+            });
+            
+            // Convert canvas to image URL
+            const imageUrl = canvas.toDataURL("image/png", 0.9);
+            
+            // Set the image source in the share modal
+            document.getElementById("shareImage").src = imageUrl;
+            
+            // Hide the score element again
+            scoreElement.style.opacity = '0';
+            
+            return imageUrl;
+          } catch (error) {
+            console.error('Error generating share image:', error);
+            scoreElement.style.opacity = '0';
+            return null;
+          }
+        }
+
+        // Share the score
+        async function shareScore() {
+          try {
+            // Create shareText with game info, score, and links
+            const shareText = `#フィンガーサーキット で鈴鹿サーキットの一筆書きに挑戦！🏁
+完成度: ${gameState.accuracy}%
+"F1 Japanese GP" LINE公式アカウントを友だち追加して、今すぐチャレンジ！👇
+https://liff.line.me/2006572406-D3OkWx32?tcode=YAQaP0000013430
+#F1jp #F1日本グランプリ`;
+            
+            // Try to copy text to clipboard as backup
+            await navigator.clipboard.writeText(shareText);
+            
+            // Get the image URL
+            const scoreImageUrl = document.getElementById("shareImage").src;
+            
+            // Use Web Share API if available
+            const supportsShareWithFiles = navigator.canShare && 
+                                          navigator.canShare({ files: [new File([], 'test.txt')] });
+            
+            if (supportsShareWithFiles && scoreImageUrl) {
+              // Convert image to blob/file for sharing
+              const res = await fetch(scoreImageUrl);
+              const blob = await res.blob();
+              const file = new File([blob], "finger-circuit-score.png", { type: "image/png" });
+              
+              // Share with both image and text
+              await navigator.share({
+                title: "フィンガーサーキット",
+                text: shareText,
+                files: [file]
+              });
+            } else if (navigator.share) {
+              // Fallback to just sharing text and URL
+              await navigator.share({
+                title: "フィンガーサーキット",
+                text: shareText,
+                url: "https://liff.line.me/2006572406-D3OkWx32?tcode=YAQaP0000013430"
+              });
+            } else {
+              // Fallback for browsers without Web Share API
+              alert('このブラウザはシェア機能に対応していません。画像を長押しして保存してください。');
+            }
+          } catch (error) {
+            console.error('Error sharing:', error);
+            alert('シェアに失敗しました。もう一度お試しください。');
+          }
+        }
+
+        // Show share modal and prepare image
+        async function showShareModal() {
           document.getElementById("shareImage").style.display = "none";
           const loadingMsg = document.createElement("p");
           loadingMsg.className = "share-loading";
@@ -1419,80 +1629,21 @@
           document.getElementById("shareModal").style.display = "flex";
           
           // Use a timeout to let the modal appear before generating the image
-          setTimeout(() => {
-            generateScoreCard()
-              .then(imageUrl => {
-                // Remove loading message
-                if (loadingMsg.parentNode) {
-                  loadingMsg.parentNode.removeChild(loadingMsg);
-                }
-                
-                const shareImage = document.getElementById("shareImage");
-                shareImage.src = imageUrl;
-                shareImage.style.display = "block";
-              })
-              .catch(error => {
-                console.error("Failed to generate score card:", error);
-                if (loadingMsg.parentNode) {
-                  loadingMsg.textContent = "Failed to generate score card";
-                }
-              });
+          setTimeout(async () => {
+            // Prepare the share element
+            await prepareShareElement();
+            
+            // Generate the score card
+            await generateScoreCard();
+            
+            // Remove loading message
+            if (loadingMsg.parentNode) {
+              loadingMsg.parentNode.removeChild(loadingMsg);
+            }
+            
+            // Show the image
+            document.getElementById("shareImage").style.display = "block";
           }, 100);
-        }
-
-        function shareResult() {
-          showShareModal();
-        }
-
-        function shareToSocialMedia() {
-          const imageUrl = document.getElementById("shareImage").src;
-          const shareText = `I completed the Finger Circuit with ${gameState.accuracy}% accuracy!`;
-          
-          // Use Web Share API with error handling
-          if (imageUrl) {
-            fetch(imageUrl)
-              .then(res => res.blob())
-              .then(blob => {
-                const file = new File([blob], "finger-circuit-score.png", { type: "image/png" });
-                
-                if (navigator.share) {
-                  navigator.share({
-                    title: "Finger Circuit Score",
-                    text: shareText,
-                    files: [file]
-                  }).catch(error => {
-                    console.error("Error sharing:", error);
-                    // Fallback for browsers that support share API but not file sharing
-                    navigator.share({
-                      title: "Finger Circuit Score",
-                      text: shareText,
-                      url: "https://liff.line.me/2006572406-D3OkWx32?tcode=YAQaP0000013430"
-                    }).catch(err => {
-                      console.error("Error in fallback share:", err);
-                      downloadImage(imageUrl);
-                    });
-                  });
-                } else {
-                  // Fallback for browsers that don't support Web Share API
-                  downloadImage(imageUrl);
-                }
-              })
-              .catch(error => {
-                console.error("Error processing image:", error);
-                alert("Couldn't process image for sharing. Please try again.");
-              });
-          }
-        }
-
-        function downloadImage(imageUrl) {
-          const downloadLink = document.createElement('a');
-          downloadLink.href = imageUrl;
-          downloadLink.download = 'finger-circuit-score.png';
-          document.body.appendChild(downloadLink);
-          downloadLink.click();
-          document.body.removeChild(downloadLink);
-          
-          alert("Image saved. You can share it manually.");
         }
 
         function returnToMap() {
@@ -1608,15 +1759,11 @@
 
             // Add button event listeners
             document.getElementById("retryButton").addEventListener("click", resetGame);
-            document.getElementById("shareButton").addEventListener("click", shareResult);
+            document.getElementById("shareButton").addEventListener("click", showShareModal);
             document.getElementById("mapButton").addEventListener("click", returnToMap);
             
-            // Removed share platform event listeners
-            
-            // Keep universal share button event listener
-            document.getElementById("universalShareButton").addEventListener("click", function() {
-              shareToSocialMedia();
-            });
+            // Add universal share button event listener
+            document.getElementById("universalShareButton").addEventListener("click", shareScore);
             
             // Add close share modal event listener
             document.getElementById("closeShare").addEventListener("click", function() {
