@@ -1176,34 +1176,31 @@
         }
 
         function calculateAccuracy() {
-          // Calculate percentage based on number of circuit segments touched
+          // Calculate percentage based on number of ALL circuit segments touched
           const totalSegments = gameState.circuitPath.length - 1;
           const touchedSegments = gameState.allSegmentsTouched.size;
           
-          // If the user path is too short, accuracy is very low but not zero
+          // If the user path is too short, accuracy is very low
           if (gameState.userPath.length < 5) {
             gameState.accuracy = 5; // Minimum accuracy score
             document.getElementById("accuracyResult").textContent = gameState.accuracy;
             return;
           }
 
-          // Calculate raw coverage
+          // Calculate coverage considering ALL segments
           const rawCoverage = touchedSegments / totalSegments;
           
-          // Convert coverage to percentage with adjusted weighting
-          // This rewards touching more of the circuit
+          // Convert coverage to percentage, using stricter scoring
           const coverageScore = rawCoverage * 100;
           
-          // Final accuracy calculation
+          // Final accuracy calculation - rounded to nearest integer
           gameState.accuracy = Math.round(coverageScore);
           
-          // Ensure accuracy is between 5 and 100
+          // Cap accuracy between 5 and 100
           gameState.accuracy = Math.max(5, Math.min(100, gameState.accuracy));
 
-          // Update UI immediately
+          // Update UI
           document.getElementById("accuracyResult").textContent = gameState.accuracy;
-          
-          // Also update the share element's accuracy value
           document.getElementById("shareAccuracyValue").textContent = gameState.accuracy;
         }
 
@@ -1317,15 +1314,15 @@
                 for (let i = 1; i < interpolated.length; i++) {
                   gameState.userPath.push(interpolated[i]);
                   
-                  // Check if point is on ANY circuit segment and track it
+                  // Check against ALL circuit segments
                   const closestInfo = findClosestPointOnPath(interpolated[i]);
                   if (closestInfo.distance <= gameState.pathWidth) {
-                    // Track visible segments for UI feedback
+                    // Track the segment regardless of visibility
+                    gameState.allSegmentsTouched.add(closestInfo.segmentIndex);
+                    // Also track visible segments for UI feedback
                     if (gameState.segmentVisibility[closestInfo.segmentIndex] === 1) {
                       gameState.touchedSegments.add(closestInfo.segmentIndex);
                     }
-                    // Track ALL segments (visible and invisible) for accuracy
-                    gameState.allSegmentsTouched.add(closestInfo.segmentIndex);
                   }
                 }
               } else {
