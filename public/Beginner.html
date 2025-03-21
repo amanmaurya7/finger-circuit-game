@@ -718,7 +718,10 @@
           continuationRadius: 20, // 20px radius = 40px diameter, ~1cm
           
           // Store the last point where the finger was lifted
-          lastLiftPoint: null
+          lastLiftPoint: null,
+          
+          // Pre-rendered share image
+          cachedShareImage: null
         };
 
         // Set canvas size
@@ -1215,6 +1218,15 @@
 
           // Update UI immediately
           document.getElementById("accuracyResult").textContent = gameState.accuracy;
+          
+          // REMOVING THIS SECTION - Don't pre-render the share image until user clicks share button
+          // prepareShareElement().then(() => {
+          //   generateScoreCard().then(imageUrl => {
+          //     if (imageUrl) {
+          //       gameState.cachedShareImage = imageUrl;
+          //     }
+          //   });
+          // });
         }
 
         // Handle touch/mouse events
@@ -1580,59 +1592,12 @@ https://liff.line.me/2006572406-D3OkWx32?tcode=YAQaP0000013430
               console.warn("Clipboard copy failed, continuing with share", err);
             }
             
-            // Get the image URL
-            const scoreImageUrl = document.getElementById("shareImage").src;
+            // Get the image URL - use cached image if available
+            const scoreImageUrl = gameState.cachedShareImage || document.getElementById("shareImage").src;
             
             // UNIVERSAL SHARING APPROACH with multiple fallbacks
             
-            // STRATEGY 1: Use the Web Share API with files (most comprehensive)
-            try {
-              if (navigator.canShare && navigator.share) {
-                // Convert image URL to File object
-                const response = await fetch(scoreImageUrl);
-                const blob = await response.blob();
-                const file = new File([blob], "finger-circuit-score.png", { type: "image/png" });
-                
-                if (navigator.canShare({ files: [file] })) {
-                  await navigator.share({
-                    title: "フィンガーサーキット",
-                    text: shareText,
-                    files: [file]
-                  });
-                  return;
-                }
-              }
-            } catch (err) {
-              console.warn("Share API with files failed, trying next method", err);
-            }
-            
-            // STRATEGY 2: Web Share API without files
-            try {
-              if (navigator.share) {
-                await navigator.share({
-                  title: "フィンガーサーキット",
-                  text: shareText,
-                  url: "https://liff.line.me/2006572406-D3OkWx32?tcode=YAQaP0000013430"
-                });
-                return;
-              }
-            } catch (err) {
-              console.warn("Share API without files failed, trying next method", err);
-            }
-            
-            // STRATEGY 3: For iOS Safari - special handling
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-            if (isIOS) {
-              try {
-                // Open sharing sheet with URL that contains image
-                window.open(`sms:&body=${encodeURIComponent(shareText)}`);
-                return;
-              } catch (err) {
-                console.warn("iOS specific share failed", err);
-              }
-            }
-            
-            // STRATEGY 4: For LINE app specific sharing
+            // STRATEGY 1: LINE-specific sharing (highest priority for LINE app)
             const isInLINE = /Line/i.test(navigator.userAgent) || window.location.href.includes('liff.line.me');
             if (isInLINE) {
               try {
@@ -1654,7 +1619,54 @@ https://liff.line.me/2006572406-D3OkWx32?tcode=YAQaP0000013430
                   }
                 }
               } catch (err) {
-                console.warn("LINE specific share failed", err);
+                console.warn("LINE specific share failed, trying next method", err);
+              }
+            }
+            
+            // STRATEGY 2: Use the Web Share API with files
+            try {
+              if (navigator.canShare && navigator.share) {
+                // Convert image URL to File object
+                const response = await fetch(scoreImageUrl);
+                const blob = await response.blob();
+                const file = new File([blob], "finger-circuit-score.png", { type: "image/png" });
+                
+                if (navigator.canShare({ files: [file] })) {
+                  await navigator.share({
+                    title: "フィンガーサーキット",
+                    text: shareText,
+                    files: [file]
+                  });
+                  return;
+                }
+              }
+            } catch (err) {
+              console.warn("Share API with files failed, trying next method", err);
+            }
+            
+            // STRATEGY 3: Web Share API without files
+            try {
+              if (navigator.share) {
+                await navigator.share({
+                  title: "フィンガーサーキット",
+                  text: shareText,
+                  url: "https://liff.line.me/2006572406-D3OkWx32?tcode=YAQaP0000013430"
+                });
+                return;
+              }
+            } catch (err) {
+              console.warn("Share API without files failed, trying next method", err);
+            }
+            
+            // STRATEGY 4: For iOS Safari - special handling
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            if (isIOS) {
+              try {
+                // Open sharing sheet with URL that contains image
+                window.open(`sms:&body=${encodeURIComponent(shareText)}`);
+                return;
+              } catch (err) {
+                console.warn("iOS specific share failed", err);
               }
             }
             
@@ -1691,6 +1703,9 @@ https://liff.line.me/2006572406-D3OkWx32?tcode=YAQaP0000013430
 
         // Show share modal and prepare image
         async function showShareModal() {
+          // Update share accuracy value just before showing modal
+          document.getElementById("shareAccuracyValue").textContent = gameState.accuracy;
+          
           document.getElementById("shareImage").style.display = "none";
           const loadingMsg = document.createElement("p");
           loadingMsg.className = "share-loading";
@@ -1702,12 +1717,18 @@ https://liff.line.me/2006572406-D3OkWx32?tcode=YAQaP0000013430
           // Use a timeout to let the modal appear before generating the image
           setTimeout(async () => {
             try {
-              // Prepare the share element and generate the score card
-              await prepareShareElement();
-              const imageUrl = await generateScoreCard();
-              
-              if (imageUrl) {
-                document.getElementById("shareImage").src = imageUrl;
+              // Use cached image if available, otherwise generate a new one
+              if (gameState.cachedShareImage) {
+                document.getElementById("shareImage").src = gameState.cachedShareImage;
+              } else {
+                // Prepare the share element and generate the score card
+                await prepareShareElement();
+                const imageUrl = await generateScoreCard();
+                
+                if (imageUrl) {
+                  document.getElementById("shareImage").src = imageUrl;
+                  gameState.cachedShareImage = imageUrl;
+                }
               }
             } catch (error) {
               console.error('Error generating share image:', error);
@@ -1821,6 +1842,7 @@ https://liff.line.me/2006572406-D3OkWx32?tcode=YAQaP0000013430
           gameState.justResumedDrawing = false;
           gameState.distanceSinceResume = 0;
           gameState.resumePoint = null;
+          gameState.cachedShareImage = null;
           
           // Hide continuation circle
           continuationCircle.style.display = "none";
