@@ -1515,41 +1515,78 @@
           });
         }
 
-        // Generate the share image
+        // Generate the share image - improved version with error handling
         async function generateScoreCard() {
           const scoreElement = document.getElementById("scoreElement");
           
           // Make the element visible to html2canvas but still hidden to user
           scoreElement.style.opacity = '1';
-          scoreElement.style.transform = 'none';
+          scoreElement.style.left = '0';
+          scoreElement.style.top = '0';
           
           try {
-            // Convert DOM element to canvas image
+            // Add a small delay to ensure the element is rendered properly
+            await new Promise(resolve => setTimeout(resolve, 200));
+            
+            // Convert DOM element to canvas image with better options
             const canvas = await html2canvas(scoreElement, {
               backgroundColor: null,
               scale: 2, // Higher resolution
               logging: false,
-              useCORS: true
+              useCORS: true,
+              allowTaint: true,
+              foreignObjectRendering: false // More compatible rendering
             });
             
-            // Convert canvas to image URL
-            const imageUrl = canvas.toDataURL("image/png", 0.9);
+            // Convert canvas to image URL with maximum quality
+            const imageUrl = canvas.toDataURL("image/png", 1.0);
             
             // Set the image source in the share modal
             document.getElementById("shareImage").src = imageUrl;
             
             // Hide the score element again
             scoreElement.style.opacity = '0';
+            scoreElement.style.left = '-9999px';
+            scoreElement.style.top = '-9999px';
             
             return imageUrl;
           } catch (error) {
             console.error('Error generating share image:', error);
             scoreElement.style.opacity = '0';
-            return null;
+            scoreElement.style.left = '-9999px';
+            scoreElement.style.top = '-9999px';
+            
+            // Create a fallback image with just text
+            try {
+              const fallbackCanvas = document.createElement('canvas');
+              fallbackCanvas.width = 320;
+              fallbackCanvas.height = 320;
+              const ctx = fallbackCanvas.getContext('2d');
+              
+              // Draw background
+              ctx.fillStyle = '#f5f5f5';
+              ctx.fillRect(0, 0, 320, 320);
+              
+              // Draw text
+              ctx.fillStyle = '#000000';
+              ctx.font = 'bold 24px MyCustomFont, sans-serif';
+              ctx.textAlign = 'center';
+              ctx.fillText('FINGER CIRCUIT', 160, 100);
+              
+              ctx.fillStyle = '#fd6aa0';
+              ctx.font = 'bold 72px MyCustomFont, sans-serif';
+              ctx.fillText(`${gameState.accuracy}%`, 160, 180);
+              
+              // Return fallback image
+              return fallbackCanvas.toDataURL("image/png", 1.0);
+            } catch (fallbackError) {
+              console.error('Fallback image creation failed:', fallbackError);
+              return null;
+            }
           }
         }
 
-        // Share the score
+        // Share the score - improved implementation
         async function shareScore() {
           try {
             // Create shareText with game info, score, and links
@@ -1560,70 +1597,130 @@ https://liff.line.me/2006572406-D3OkWx32?tcode=YAQaP0000013430
 #F1jp #F1日本グランプリ`;
             
             // Try to copy text to clipboard as backup
-            await navigator.clipboard.writeText(shareText);
+            try {
+              await navigator.clipboard.writeText(shareText);
+              console.log("Text copied to clipboard as backup");
+            } catch (clipError) {
+              console.warn("Could not copy to clipboard:", clipError);
+            }
             
             // Get the image URL
             const scoreImageUrl = document.getElementById("shareImage").src;
             
-            // Use Web Share API if available
-            const supportsShareWithFiles = navigator.canShare && 
-                                          navigator.canShare({ files: [new File([], 'test.txt')] });
-            
-            if (supportsShareWithFiles && scoreImageUrl) {
-              // Convert image to blob/file for sharing
-              const res = await fetch(scoreImageUrl);
-              const blob = await res.blob();
-              const file = new File([blob], "finger-circuit-score.png", { type: "image/png" });
-              
-              // Share with both image and text
-              await navigator.share({
-                title: "フィンガーサーキット",
-                text: shareText,
-                files: [file]
-              });
-            } else if (navigator.share) {
-              // Fallback to just sharing text and URL
-              await navigator.share({
-                title: "フィンガーサーキット",
-                text: shareText,
-                url: "https://liff.line.me/2006572406-D3OkWx32?tcode=YAQaP0000013430"
-              });
-            } else {
-              // Fallback for browsers without Web Share API
-              alert('このブラウザはシェア機能に対応していません。画像を長押しして保存してください。');
+            // First method: Try Web Share API with files if supported
+            if (navigator.canShare && navigator.share) {
+              try {
+                // Convert image to blob for sharing
+                const res = await fetch(scoreImageUrl);
+                const blob = await res.blob();
+                const file = new File([blob], "finger-circuit-score.png", { type: "image/png" });
+                
+                // Check if sharing files is supported
+                if (navigator.canShare({ files: [file] })) {
+                  // Share with both image and text
+                  await navigator.share({
+                    title: "フィンガーサーキット",
+                    text: shareText,
+                    files: [file]
+                  });
+                  return; // Exit if successful
+                } else {
+                  // Fallback to sharing without files
+                  await navigator.share({
+                    title: "フィンガーサーキット",
+                    text: shareText,
+                    url: "https://liff.line.me/2006572406-D3OkWx32?tcode=YAQaP0000013430"
+                  });
+                  return; // Exit if successful
+                }
+              } catch (shareApiError) {
+                console.warn("Web Share API with files failed:", shareApiError);
+                // Continue to alternative methods
+              }
             }
+            
+            // Second method: Try sharing via alternative means
+            // Create a temporary link for downloading the image
+            const tempLink = document.createElement('a');
+            tempLink.href = scoreImageUrl;
+            tempLink.download = 'finger-circuit-score.png';
+            
+            // Show a more comprehensive sharing dialog with instructions
+            const dialogMessage = `
+              スコアをシェアするには:
+              
+              1. 画像を長押しして保存 (右クリックで「名前を付けて画像を保存」)
+              2. 以下のテキストをコピーしました。SNSに画像と一緒に投稿してください。
+              
+              ${shareText}
+            `;
+            
+            alert(dialogMessage);
+            
+            // Trigger the download of the image
+            document.body.appendChild(tempLink);
+            tempLink.click();
+            document.body.removeChild(tempLink);
+            
           } catch (error) {
-            console.error('Error sharing:', error);
-            alert('シェアに失敗しました。もう一度お試しください。');
+            console.error('Error in shareScore:', error);
+            alert('シェアに失敗しました。画像を手動で保存してテキストをコピーしてください。');
           }
         }
 
-        // Show share modal and prepare image
+        // Show share modal and prepare image - with improved error handling
         async function showShareModal() {
           document.getElementById("shareImage").style.display = "none";
           const loadingMsg = document.createElement("p");
           loadingMsg.className = "share-loading";
-          loadingMsg.textContent = "Loading...";
+          loadingMsg.textContent = "生成中..."; // "Generating..." in Japanese
           document.querySelector(".share-content").insertBefore(loadingMsg, document.getElementById("universalShareButton"));
           
           document.getElementById("shareModal").style.display = "flex";
           
+          let imageGenerated = false;
+          let attemptCount = 0;
+          const maxAttempts = 3;
+          
           // Use a timeout to let the modal appear before generating the image
           setTimeout(async () => {
-            // Prepare the share element
-            await prepareShareElement();
-            
-            // Generate the score card
-            await generateScoreCard();
+            // Try multiple times if needed
+            while (!imageGenerated && attemptCount < maxAttempts) {
+              attemptCount++;
+              try {
+                // Prepare the share element
+                await prepareShareElement();
+                
+                // Generate the score card
+                const imageUrl = await generateScoreCard();
+                
+                if (imageUrl) {
+                  // Set the image source
+                  document.getElementById("shareImage").src = imageUrl;
+                  imageGenerated = true;
+                }
+              } catch (error) {
+                console.error(`Generation attempt ${attemptCount} failed:`, error);
+                await new Promise(resolve => setTimeout(resolve, 200)); // Wait before retrying
+              }
+            }
             
             // Remove loading message
             if (loadingMsg.parentNode) {
               loadingMsg.parentNode.removeChild(loadingMsg);
             }
             
-            // Show the image
+            if (!imageGenerated) {
+              // Show error message if all attempts failed
+              const errorMsg = document.createElement("p");
+              errorMsg.textContent = "画像の生成に失敗しました。";
+              errorMsg.style.color = "#ff0000";
+              document.querySelector(".share-content").insertBefore(errorMsg, document.getElementById("universalShareButton"));
+            }
+            
+            // Show the image or placeholder
             document.getElementById("shareImage").style.display = "block";
-          }, 100);
+          }, 300);
         }
 
         function returnToMap() {
