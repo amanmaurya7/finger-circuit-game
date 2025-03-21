@@ -130,43 +130,6 @@
             transform: scale(1.05);
         }
         
-        .nav-bar {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            background: #ff0000;
-            display: flex;
-            justify-content: space-around;
-            align-items: center; /* Added for vertical alignment */
-            padding: 8px 0;
-            z-index: 3;
-        }
-        
-        .nav-icon {
-            color: white;
-            text-decoration: none;
-            display: flex;
-            flex-direction: column; /* Changed back to column to put text below icon */
-            align-items: center; /* Center items vertically */
-            font-size: 12px;
-            gap: 4px; /* Add space between icon and text */
-        }
-        
-        .nav-icon svg {
-            max-height: 20px; /* Control the icon height */
-            width: auto; /* Maintain aspect ratio */
-            vertical-align: middle;
-        }
-        
-        .nav-icon span {
-            margin-top: 2px; /* Add small margin to separate icon and text */
-            vertical-align: middle;
-        }
-        
-        /* Add special handling for the last icon (menu) that doesn't have text */
-        .nav-icon:last-child {
-            justify-content: center;
-        }
         
         .logo {
             text-align: center;
@@ -233,18 +196,7 @@
             .logo-line {
                 width: 30px;
             }
-            
-            .nav-bar {
-                padding: 6px 0;
-            }
-            
-            .nav-icon {
-                font-size: 10px;
-            }
-            
-            .nav-icon svg {
-                max-height: 18px;
-            }
+           
         }
 
         @media (max-height: 500px) {
@@ -291,14 +243,7 @@
                 font-size: 12px;
                 padding: 8px 12px;
             }
-            
-            .nav-icon {
-                font-size: 9px;
-            }
-            
-            .nav-icon svg {
-                max-height: 16px;
-            }
+          
             
             .logo img {
                 height: 35px;
@@ -339,14 +284,7 @@
             .logo {
                 width: 45%;
             }
-            
-            .nav-bar {
-                padding: 4px 0;
-            }
-            
-            .nav-icon span {
-                font-size: 8px;
-            }
+          
         }
 
         @media (orientation: landscape) {
@@ -402,24 +340,6 @@
             </div>
         </div>
         
-        <!-- Navigation bar -->
-        <div class="nav-bar">
-            <a href="#" class="nav-icon">
-                 <img src="./assets/home.svg" alt="">
-                <span>HOME</span>
-            </a>
-            <a href="https://redlight-one.vercel.app/" class="nav-icon">
-                <img src="./assets/driver.svg" alt="">
-                <span>DRIVER</span>
-            </a>
-            <a href="https://finger-circuit-game.vercel.app/" class="nav-icon">
-               <img src="./assets/circuit.svg" alt="">
-                <span>CIRCUIT</span>
-            </a>
-            <a href="#" class="nav-icon">
-                <img src="./assets/menu.svg" alt="">
-                <span>Menu</span>
-            </a>
     </div>
     
     <script>

@@ -105,38 +105,6 @@
         aspect-ratio: 350/500;
       }
 
-      .nav-bar {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: #ff0000;
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        padding: 8px 0;
-        z-index: 10;
-        height: 60px;
-      }
-
-      .nav-icon {
-        color: white;
-        text-decoration: none;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        font-size: 10px;
-        gap: 4px;
-      }
-
-      .nav-icon svg {
-        height: 24px;
-        width: auto;
-      }
-
-      .nav-icon span {
-        margin-top: 2px;
-      }
 
       .mission-banner {
         position: absolute;
@@ -144,15 +112,14 @@
         top: 50%;
         transform: translate(-50%, -50%);
         margin-top: 50px;
-        width: 80%;
-        max-width: 400px;
+        width: 100%;
         background: rgba(255, 255, 255, 0.95);
         padding: 15px 20px;
         text-align: center;
         z-index: 4;
         opacity: 1;
         transition: opacity 0.5s ease;
-        border-radius: 10px;
+        border-radius: 0;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
       }
 
@@ -556,19 +523,7 @@
           max-width: 600px;
         }
 
-        .nav-bar {
-          height: 50px;
-          padding: 5px 0;
-        }
-
-        .nav-icon svg {
-          height: 20px;
-        }
-
-        .nav-icon {
-          font-size: 9px;
-        }
-        
+       
         /* Adjust result screen for smaller heights */
         .result-screen {
           top: 50px;
@@ -678,25 +633,6 @@
         </div>
       </div>
 
-      <!-- Navigation bar -->
-      <div class="nav-bar">
-        <a href="index.html" class="nav-icon">
-            <img src="./assets/home.svg" alt="">
-            <span>HOME</span>
-        </a>
-        <a href="https://redlight-one.vercel.app/" class="nav-icon">
-          <img src="./assets/driver.svg" alt="">
-          <span>DRIVER</span>
-        </a>
-        <a href="https://finger-circuit-game.vercel.app/" class="nav-icon">
-          <img src="./assets/circuit.svg" alt="">
-          <span>CIRCUIT</span>
-        </a>
-        <a href="#" class="nav-icon">
-            <img src="./assets/menu.svg" alt="">
-            <span>Menu</span>
-        </a>
-      </div>
     </div>
 
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
@@ -1662,7 +1598,7 @@
           }
         }
 
-        // Share the score
+        // Share the score - direct version without instructions or additional dialogs
         async function shareScore() {
           try {
             // Create shareText with game info, score, and links
@@ -1672,76 +1608,78 @@
 https://liff.line.me/2006572406-D3OkWx32?tcode=YAQaP0000013430
 #F1jp #F1日本グランプリ`;
             
-            // Try to copy text to clipboard as backup
+            // Copy text to clipboard silently 
             try {
               await navigator.clipboard.writeText(shareText);
-              console.log("Text copied to clipboard as backup");
-            } catch (clipError) {
-              console.warn("Could not copy to clipboard:", clipError);
+            } catch (err) {
+              console.warn("Clipboard copy failed", err);
             }
             
             // Get the image URL
             const scoreImageUrl = document.getElementById("shareImage").src;
             
-            // First method: Try Web Share API with files if supported
-            if (navigator.canShare && navigator.share) {
+            // Attempt to use Web Share API with files first
+            if (navigator.canShare && navigator.share && scoreImageUrl) {
               try {
-                // Convert image to blob for sharing
                 const res = await fetch(scoreImageUrl);
                 const blob = await res.blob();
                 const file = new File([blob], "finger-circuit-score.png", { type: "image/png" });
                 
-                // Check if sharing files is supported
                 if (navigator.canShare({ files: [file] })) {
-                  // Share with both image and text
                   await navigator.share({
                     title: "フィンガーサーキット",
                     text: shareText,
                     files: [file]
                   });
-                  return; // Exit if successful
-                } else {
-                  // Fallback to sharing without files
-                  await navigator.share({
-                    title: "フィンガーサーキット",
-                    text: shareText,
-                    url: "https://liff.line.me/2006572406-D3OkWx32?tcode=YAQaP0000013430"
-                  });
-                  return; // Exit if successful
+                  return;
                 }
-              } catch (shareApiError) {
-                console.warn("Web Share API with files failed:", shareApiError);
-                // Continue to alternative methods
+              } catch (err) {
+                console.warn("Share API with files failed", err);
               }
             }
             
-            // Second method: Try sharing via alternative means
-            // Create a temporary link for downloading the image
+            // Fallback to Web Share API without files
+            if (navigator.share) {
+              try {
+                await navigator.share({
+                  title: "フィンガーサーキット",
+                  text: shareText,
+                  url: "https://liff.line.me/2006572406-D3OkWx32?tcode=YAQaP0000013430"
+                });
+                return;
+              } catch (err) {
+                console.warn("Share API without files failed", err);
+              }
+            }
+            
+            // Last resort: silently download the image
             const tempLink = document.createElement('a');
             tempLink.href = scoreImageUrl;
             tempLink.download = 'finger-circuit-score.png';
-            
-            // Show a more comprehensive sharing dialog with instructions
-            const dialogMessage = `
-              スコアをシェアするには:
-              
-              1. 画像を長押しして保存 (右クリックで「名前を付けて画像を保存」)
-              2. 以下のテキストをコピーしました。SNSに画像と一緒に投稿してください。
-              
-              ${shareText}
-            `;
-            
-            alert(dialogMessage);
-            
-            // Trigger the download of the image
             document.body.appendChild(tempLink);
             tempLink.click();
             document.body.removeChild(tempLink);
             
           } catch (error) {
-            console.error('Error in shareScore:', error);
-            alert('シェアに失敗しました。画像を手動で保存してテキストをコピーしてください。');
+            console.error('Share error:', error);
           }
+        }
+
+        // Remove the embedTextInImage function since we're not using it anymore
+        // Add a new function to check if sharing is available specifically for this use case
+        function checkSharingCapability() {
+          // Check if Share API is available
+          const hasShareApi = navigator.share !== undefined;
+          
+          // Check if can share with files
+          const canShareFiles = navigator.canShare && 
+                               navigator.canShare({ files: [new File(["test"], "test.txt", { type: "text/plain" })] });
+          
+          // Check if clipboard API is available
+          const hasClipboard = navigator.clipboard !== undefined;
+          
+          console.log(`Sharing capabilities: API=${hasShareApi}, Files=${canShareFiles}, Clipboard=${hasClipboard}`);
+          return { hasShareApi, canShareFiles, hasClipboard };
         }
 
         // Generate the share image - improved version with error handling
@@ -1815,41 +1753,31 @@ https://liff.line.me/2006572406-D3OkWx32?tcode=YAQaP0000013430
           }
         }
 
-        // Show share modal and prepare image - with improved error handling
+        // Show share modal and prepare image - simplified version
         async function showShareModal() {
           document.getElementById("shareImage").style.display = "none";
           const loadingMsg = document.createElement("p");
           loadingMsg.className = "share-loading";
-          loadingMsg.textContent = "生成中..."; // "Generating..." in Japanese
+          loadingMsg.textContent = "生成中...";
           document.querySelector(".share-content").insertBefore(loadingMsg, document.getElementById("universalShareButton"));
           
           document.getElementById("shareModal").style.display = "flex";
           
-          let imageGenerated = false;
-          let attemptCount = 0;
-          const maxAttempts = 3;
+          // Check device sharing capabilities
+          const hasShareApi = navigator.share !== undefined;
           
           // Use a timeout to let the modal appear before generating the image
           setTimeout(async () => {
-            // Try multiple times if needed
-            while (!imageGenerated && attemptCount < maxAttempts) {
-              attemptCount++;
-              try {
-                // Prepare the share element
-                await prepareShareElement();
-                
-                // Generate the score card
-                const imageUrl = await generateScoreCard();
-                
-                if (imageUrl) {
-                  // Set the image source
-                  document.getElementById("shareImage").src = imageUrl;
-                  imageGenerated = true;
-                }
-              } catch (error) {
-                console.error(`Generation attempt ${attemptCount} failed:`, error);
-                await new Promise(resolve => setTimeout(resolve, 200)); // Wait before retrying
+            try {
+              // Prepare the share element and generate the score card
+              await prepareShareElement();
+              const imageUrl = await generateScoreCard();
+              
+              if (imageUrl) {
+                document.getElementById("shareImage").src = imageUrl;
               }
+            } catch (error) {
+              console.error('Error generating share image:', error);
             }
             
             // Remove loading message
@@ -1857,15 +1785,26 @@ https://liff.line.me/2006572406-D3OkWx32?tcode=YAQaP0000013430
               loadingMsg.parentNode.removeChild(loadingMsg);
             }
             
-            if (!imageGenerated) {
-              // Show error message if all attempts failed
-              const errorMsg = document.createElement("p");
-              errorMsg.textContent = "画像の生成に失敗しました。";
-              errorMsg.style.color = "#ff0000";
-              document.querySelector(".share-content").insertBefore(errorMsg, document.getElementById("universalShareButton"));
+            // Update button based on capabilities
+            const shareButton = document.getElementById("universalShareButton");
+            
+            if (hasShareApi) {
+              // Show share icon
+              shareButton.innerHTML = `
+                <svg class="share-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white">
+                  <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
+                </svg>
+              `;
+            } else {
+              // Show download icon
+              shareButton.innerHTML = `
+                <svg class="share-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white">
+                  <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                </svg>
+              `;
             }
             
-            // Show the image or placeholder
+            // Show the image
             document.getElementById("shareImage").style.display = "block";
           }, 300);
         }
