@@ -98,7 +98,7 @@
         max-width: 800px;
         border: 1px solid rgba(0, 0, 0, 0.1);
         touch-action: none;
-        background-image: url("assets/map.svg");
+        background-image: url("assets/beginner.svg");
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
@@ -768,56 +768,51 @@
           // 2 = fully visible (dark blue)
           // 1 = partially visible (light blue) 
           // 0 = hidden but still part of the circuit
-          const baseCoordinates = [
-            // Start point - vertical line at top (dark blue)
-            { x: 73, y: 150, visible: 2 },
-            { x: 75, y: 80, visible: 2 },
-            { x: 75, y: 50, visible: 2 },
+            const baseCoordinates = [
+            // Start point
+            { x: 70, y: 170, visible: 0 },
 
-            // Top loop - S curve in upper section (dark blue)
+            // Vertical line up
+            { x: 75, y: 80, visible: 0 },
+            { x: 75, y: 50, visible: 0 },
+
+            // Top loop
             { x: 100, y: 38, visible: 0 },
             { x: 115, y: 60, visible: 0 },
             { x: 110, y: 95, visible: 0 },
-            { x: 100, y: 110, visible: 2 },
-            { x: 125, y: 120, visible: 2 }, // Start of visible curve
-            { x: 100, y: 150, visible: 2 },
-            { x: 115, y: 155, visible: 2 },
+            { x: 100, y: 110, visible: 0 },
+            { x: 125, y: 120, visible: 0 },
+            { x: 100, y: 150, visible: 0 },
+            { x: 115, y: 155, visible: 0 },
 
-            // Middle section - horizontal segments (dark blue)
-            { x: 130, y: 180, visible: 2 },
-            { x: 90,  y: 200, visible: 0 },
-            { x: 90,  y: 220, visible: 0 }, // Start of visible horizontal segment
-            { x: 110, y: 240, visible: 2 },
-            { x: 140, y: 230, visible: 2 },
-            { x: 150, y: 250, visible: 2 },
-            { x: 190, y: 240, visible: 2 }, // End of visible horizontal segment
-            { x: 170, y: 220, visible: 0 },
-            { x: 190, y: 280, visible: 2 },
-            { x: 185, y: 300, visible: 2 },
-            { x: 140, y: 335, visible: 2 },
+            // S-curve section
+            { x: 130, y: 180, visible: 0 },
+            { x: 80, y: 200, visible: 0 },
+            { x: 90, y: 220, visible: 0 },
+            { x: 105, y: 240, visible: 0 },
+            { x: 140, y: 220, visible: 0 },
+            { x: 150, y: 250, visible: 0 },
+            { x: 205, y: 250, visible: 0 },
+            { x: 180, y: 300, visible: 0 },
+            { x: 130, y: 340, visible: 0 },
 
             // Horizontal middle section
-            { x: 190, y: 325, visible: 2 },
-
-            // Right curve down - partially visible (light blue)
-            { x: 245, y: 400, visible: 1 },
-            { x: 230, y: 430, visible: 1 },
-
-            // Bottom large loop - partially visible (light blue)
-            { x: 270, y: 480, visible: 1 },
-            { x: 270, y: 400, visible: 1 },
-            { x: 240, y: 350, visible: 1 },
-
-            // Return path - invisible but still part of the circuit
             { x: 200, y: 320, visible: 0 },
-            { x: 180, y: 260, visible: 2 },
-            { x: 120, y: 260, visible: 2 },
-            { x: 80, y: 240, visible: 2 },
+
+            // Right curve down 
+            { x: 265, y: 390, visible: 0 },
+            { x: 220, y: 430, visible: 0 },
+
+            // Bottom large loop
+            { x: 270, y: 470, visible: 0 },
+            { x: 290, y: 420, visible: 0 },
+            { x: 240, y: 300, visible: 0 },
+
+            // Return path
+            { x: 200, y: 300, visible: 0 },
+            { x: 65, y: 230, visible: 0 },
             { x: 73, y: 150, visible: 0 },
-            { x: 180, y: 270, visible: 0 },
-            { x: 73, y: 250, visible: 0 },
-            { x: 73, y: 150, visible: 0 },
-          ];
+            ];
 
           // Calculate the scale factors based on current canvas size
           const scaleX = canvas.width / 350;
