@@ -1135,17 +1135,19 @@
           
           const lastPoint = gameState.userPath[gameState.userPath.length - 1];
           
-          // ONLY check if exactly at END POINT with very strict threshold
+          // Check for ending at either the start point OR the end point
+          const startPoint = gameState.circuitPath[0];
           const endPoint = gameState.circuitPath[gameState.circuitPath.length - 1];
-          const dxEnd = lastPoint.x - endPoint.x;
-          const dyEnd = lastPoint.y - endPoint.y;
-          const distanceToEnd = Math.sqrt(dxEnd * dxEnd + dyEnd * dyEnd);
           
-          // Make the completion threshold much smaller to require direct touching
-          const strictTouchThreshold = 15; // Smaller radius for exact touch detection
+          // Calculate distances to start and end points
+          const distanceToStart = Math.hypot(lastPoint.x - startPoint.x, lastPoint.y - startPoint.y);
+          const distanceToEnd = Math.hypot(lastPoint.x - endPoint.x, lastPoint.y - endPoint.y);
           
-          // ONLY complete if very precisely touching the end point
-          if (distanceToEnd < strictTouchThreshold) {
+          // Set slightly more forgiving detection radius (but not too large)
+          const completionRadius = 20;
+          
+          // Complete if touching start OR end point
+          if (distanceToStart < completionRadius || distanceToEnd < completionRadius) {
             // Set circuit as completed to prevent further drawing
             gameState.circuitCompleted = true;
             gameState.calculatingAccuracy = true;
@@ -1165,34 +1167,32 @@
 
         // Calculate accuracy by comparing user path to ideal path
         function calculateAccuracy() {
-          // Calculate percentage based on number of circuit segments touched
-          const totalSegments = gameState.circuitPath.length - 1;
-          const touchedSegments = gameState.allSegmentsTouched.size;
-          
           // If the user path is too short, accuracy is very low but not zero
           if (gameState.userPath.length < 5) {
             gameState.accuracy = 5; // Minimum accuracy score
             document.getElementById("accuracyResult").textContent = gameState.accuracy;
             return;
           }
-
-          // Calculate raw coverage
+          
+          // WEIGHTED FACTOR SCORING SYSTEM
+          // 1. Calculate circuit coverage (how much of the circuit was touched)
+          const totalSegments = gameState.circuitPath.length - 1; 
+          const touchedSegments = gameState.allSegmentsTouched.size;
           const rawCoverage = touchedSegments / totalSegments;
           
-          // Set up checkpoint segments to ensure the entire circuit is followed
+          // 2. Check for key checkpoint coverage (evenly spaced important points)
           const checkpointSegments = [];
-          // Add some key segments as checkpoints - evenly distributed around the circuit
-          const segmentsPerCheckpoint = Math.max(1, Math.floor(totalSegments / 8));
+          const checkpointCount = 10; // More checkpoints for better accuracy
+          const segmentInterval = Math.max(1, Math.floor(totalSegments / checkpointCount));
           
-          for (let i = 0; i < totalSegments; i += segmentsPerCheckpoint) {
+          for (let i = 0; i < totalSegments; i += segmentInterval) {
             checkpointSegments.push(i);
           }
-          // Ensure end segment is included
-          if (checkpointSegments[checkpointSegments.length - 1] !== totalSegments - 1) {
-            checkpointSegments.push(totalSegments - 1);
-          }
+          // Ensure start and end segments are included
+          if (!checkpointSegments.includes(0)) checkpointSegments.push(0);
+          if (!checkpointSegments.includes(totalSegments - 1)) checkpointSegments.push(totalSegments - 1);
           
-          // Check if all checkpoint segments were visited
+          // Count how many checkpoints were visited
           let checkpointsVisitedCount = 0;
           for (const checkpointIndex of checkpointSegments) {
             if (gameState.allSegmentsTouched.has(checkpointIndex)) {
@@ -1202,26 +1202,50 @@
           
           const checkpointRatio = checkpointsVisitedCount / checkpointSegments.length;
           
-          // Final accuracy calculation with weighted components
-          let finalScore = (rawCoverage * 0.7) + (checkpointRatio * 0.3);
+          // 3. Track precision (how closely user followed the path)
+          // Calculate average distance of user path points to the circuit path
+          let totalDistanceToPath = 0;
+          let pointsChecked = 0;
+          
+          // Sample user path points (not all points to save performance)
+          const sampleInterval = Math.max(1, Math.floor(gameState.userPath.length / 50));
+          for (let i = 0; i < gameState.userPath.length; i += sampleInterval) {
+            const point = gameState.userPath[i];
+            const closestInfo = findClosestPointOnPath(point);
+            totalDistanceToPath += Math.min(closestInfo.distance, gameState.pathWidth * 2);
+            pointsChecked++;
+          }
+          
+          // Convert average distance to a 0-1 precision score (lower distance = better precision)
+          const avgDistance = pointsChecked > 0 ? totalDistanceToPath / pointsChecked : gameState.pathWidth;
+          const precisionScore = Math.max(0, 1 - (avgDistance / (gameState.pathWidth * 2)));
+          
+          // Final weighted accuracy calculation
+          const weightCoverage = 0.5;       // 50% weight on covering the whole circuit
+          const weightCheckpoints = 0.3;    // 30% weight on hitting critical checkpoints
+          const weightPrecision = 0.2;      // 20% weight on drawing precision
+          
+          let finalScore = (rawCoverage * weightCoverage) + 
+                          (checkpointRatio * weightCheckpoints) + 
+                          (precisionScore * weightPrecision);
+          
+          // Adjust score based on coverage thresholds
+          if (rawCoverage < 0.3) {
+            // Severely penalize very low coverage
+            finalScore *= 0.5;
+          } else if (checkpointRatio < 0.4) {
+            // Penalize missing too many checkpoints
+            finalScore *= 0.7;
+          }
           
           // Convert to percentage
           gameState.accuracy = Math.round(finalScore * 100);
           
           // Ensure accuracy is between 5 and 100
           gameState.accuracy = Math.max(5, Math.min(100, gameState.accuracy));
-
+          
           // Update UI immediately
           document.getElementById("accuracyResult").textContent = gameState.accuracy;
-          
-          // REMOVING THIS SECTION - Don't pre-render the share image until user clicks share button
-          // prepareShareElement().then(() => {
-          //   generateScoreCard().then(imageUrl => {
-          //     if (imageUrl) {
-          //       gameState.cachedShareImage = imageUrl;
-          //     }
-          //   });
-          // });
         }
 
         // Handle touch/mouse events
@@ -1261,7 +1285,7 @@
 
               // Reset segment tracking
               gameState.touchedSegments = new Set();
-              gameState.allSegmentsTouched = new Set();
+              gameState.allSegmentsTouched = new Set([0]); // Mark first segment as touched
               gameState.visitedInOrder = [];
               gameState.lastCheckpointIndex = -1;
 
@@ -1379,6 +1403,18 @@
                   if (closestInfo.distance <= gameState.pathWidth) {
                     gameState.touchedSegments.add(closestInfo.segmentIndex);
                     gameState.allSegmentsTouched.add(closestInfo.segmentIndex);
+                    
+                    // Check if we're at the last segment to detect completion
+                    const lastSegment = gameState.circuitPath.length - 2;
+                    if (closestInfo.segmentIndex === lastSegment) {
+                      // We're very near the end, check for actual completion
+                      const endPoint = gameState.circuitPath[gameState.circuitPath.length - 1];
+                      const distToEnd = distanceBetween(interpolated[i], endPoint);
+                      if (distToEnd <= gameState.completionThreshold) {
+                        // We've reached the end point - check completion
+                        checkCompletion(true);
+                      }
+                    }
                   }
                 }
               } else {
@@ -1390,6 +1426,18 @@
                 if (closestInfo.distance <= gameState.pathWidth) {
                   gameState.touchedSegments.add(closestInfo.segmentIndex);
                   gameState.allSegmentsTouched.add(closestInfo.segmentIndex);
+                  
+                  // Check if we're at the last segment to detect completion
+                  const lastSegment = gameState.circuitPath.length - 2; 
+                  if (closestInfo.segmentIndex === lastSegment) {
+                    // We're very near the end, check for actual completion
+                    const endPoint = gameState.circuitPath[gameState.circuitPath.length - 1];
+                    const distToEnd = distanceBetween(pos, endPoint);
+                    if (distToEnd <= gameState.completionThreshold) {
+                      // We've reached the end point - check completion
+                      checkCompletion(true);
+                    }
+                  }
                 }
               }
             } else {
@@ -1423,6 +1471,18 @@
           if (gameState.isDrawing) {
             gameState.isDrawing = false;
             gameState.touchActive = false;
+            
+            // Check completion when finger is lifted - possibly user ended near end point
+            if (gameState.userPath.length > 5) {
+              const lastPoint = gameState.userPath[gameState.userPath.length - 1];
+              const endPoint = gameState.circuitPath[gameState.circuitPath.length - 1];
+              const distToEnd = distanceBetween(lastPoint, endPoint);
+              
+              // More generous threshold when lifting finger
+              if (distToEnd <= gameState.completionThreshold * 1.5) {
+                checkCompletion(true);
+              }
+            }
             
             // Store the last point where finger was lifted
             if (gameState.lastPoint && !gameState.circuitCompleted) {
@@ -1738,6 +1798,7 @@ https://liff.line.me/2006572406-D3OkWx32?tcode=YAQaP0000013430
             const shareButton = document.getElementById("universalShareButton");
             shareButton.innerHTML = `
               <svg class="share-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white">
+                <path d="M0 0h24v24H0z" fill="none"/>
                 <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
               </svg>
             `;
@@ -1891,12 +1952,13 @@ https://liff.line.me/2006572406-D3OkWx32?tcode=YAQaP0000013430
             missionBanner.style.opacity = "1";
             gameState.status = "initializing";
             
-            // Update game state with strict endpoint touch detection
+            // Update game state with better detection settings
             gameState.minCircuitCoverage = 0.0;           // No minimum circuit coverage required
-            gameState.completionThreshold = 15;           // Much smaller end point detection radius
-            gameState.quickCompletionEnabled = false;     // Disable quick completion
-            gameState.checkCompletionOnLift = false;      // Disable completion check on finger lift
+            gameState.completionThreshold = 20;           // More reasonable end point detection radius
+            gameState.quickCompletionEnabled = true;      // Enable quick completion
+            gameState.checkCompletionOnLift = true;       // Check completion on finger lift
             gameState.minPlayTime = 500;                  // Short minimum play time
+            gameState.pathWidth = 25;                     // Slightly wider path width for better detection
             
             setTimeout(function () {
               whiteBelt.style.opacity = "0";
