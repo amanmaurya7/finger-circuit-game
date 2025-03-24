@@ -213,6 +213,7 @@
         font-size: 14px;
         margin-top: 50px;
         margin-bottom: 5px;
+        font-family: 'MyCustomFont', sans-serif;
       }
 
       .result-title-en {
@@ -221,6 +222,7 @@
         font-weight: bold;
         margin-bottom: 15px;
         letter-spacing: 1px;
+        font-family: 'MyCustomFont', sans-serif;
       }
 
       .completion-label {
@@ -228,6 +230,7 @@
         font-size: 22px;
         margin-bottom: 5px;
         text-align: center;
+        font-family: 'MyCustomFont', sans-serif;
       }
 
       .completion-value {
@@ -242,6 +245,7 @@
         align-items: center;
         justify-content: center;
         margin-bottom: 20px;
+        font-family: 'MyCustomFont', sans-serif;
       }
 
       .completion-value .percent {
@@ -262,17 +266,13 @@
         cursor: pointer;
         text-align: center;
         font-weight: bold;
+        font-family: 'MyCustomFont', sans-serif;
       }
 
       .share-button {
         background-color: #666;
         color: white;
         width: 70%;
-        height: 53px;
-        margin-bottom: 25px;
-      }
-
-      .retry-button {
         background-color: #666;
         color: white;
         width: 70%;
@@ -587,30 +587,31 @@
 
       <div id="resultScreen" class="result-screen">
         <div class="result-modal">
-          <div class="result-title-jp">ミッションクリア</div>
-          <div class="result-title-en">MISSION CLEAR</div>
-          <div class="completion-label">完成度</div>
-          <div class="completion-value">
+          <div class="result-title-jp" style="font-family: 'MyCustomFont', sans-serif;">ミッションクリア</div>
+          <div class="result-title-en" style="font-family: 'MyCustomFont', sans-serif;">MISSION CLEAR</div>
+          <div class="completion-label" style="font-family: 'MyCustomFont', sans-serif;">完成度</div>
+          <div class="completion-value" style="font-family: 'MyCustomFont', sans-serif;">
             <span id="accuracyResult"></span>
             <span class="percent">%</span>
           </div>
-          <button id="shareButton" class="result-button share-button">
+          <button id="shareButton" class="result-button share-button" style="font-family: 'MyCustomFont', sans-serif;">
             SNSでシェアする
           </button>
-          <button id="retryButton" class="result-button retry-button">
+          <button id="retryButton" class="result-button retry-button" style="font-family: 'MyCustomFont', sans-serif;">
             もう一度遊ぶ
           </button>
-          <button id="mapButton" class="result-button map-button">
-            マップに戻る
-          </button>
+            <button id="mapButton" class="result-button map-button" onclick="window.location.href='/'" style="font-family: 'MyCustomFont', sans-serif;">
+            
+              CI<span style="color:#ff0000">R</span>CUIT JOURN<span style="color:#ff0000">E</span>Y
+            </button>
         </div>
       </div>
 
       <!-- Hidden element for generating share image -->
-      <div id="scoreElement">
+      <div id="scoreElement" style="font-family: 'MyCustomFont', sans-serif;">
         <div class="share-header">
-          <div class="share-game-title">FINGER CIRCUIT</div>
-          <div class="share-game-mode">CHALLENGE</div>
+          <div class="share-game-title" style="font-family: 'MyCustomFont', sans-serif;">FINGER CIRCUIT</div>
+          <div class="share-game-mode" style="font-family: 'MyCustomFont', sans-serif;">CHALLENGE</div>
         </div>
         <div class="share-score-label">完成度</div>
         <div class="share-score-value">
