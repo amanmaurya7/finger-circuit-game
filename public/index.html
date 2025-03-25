@@ -177,11 +177,13 @@
             
             .content-area {
                 padding-top: 60px;
+                min-height: calc(100vh - 100px);
             }
             
             .mode-buttons {
                 gap: 8px;
                 margin-top: 20px;
+                margin-bottom: 20px;
             }
             
             .mode-btn {
@@ -196,7 +198,10 @@
             .logo-line {
                 width: 30px;
             }
-           
+            
+            .logo {
+                margin-bottom: 30px;
+            }
         }
 
         @media (max-height: 500px) {
@@ -213,7 +218,8 @@
             }
             
             .content-area {
-                top: 50px;
+                padding-top: 50px;
+                min-height: calc(100vh - 80px);
             }
             
             .mode-btn {
@@ -227,6 +233,10 @@
             
             .logo-line {
                 width: 25px;
+            }
+            
+            .logo {
+                margin-bottom: 20px;
             }
         }
 
@@ -243,14 +253,19 @@
                 font-size: 12px;
                 padding: 8px 12px;
             }
-          
             
             .logo img {
                 height: 35px;
+                max-width: 150px;
             }
             
             .logo-line {
-                width: 25px;
+                width: 20px;
+                margin: 0 8px;
+            }
+            
+            .mode-buttons {
+                width: 90%;
             }
         }
 
@@ -258,6 +273,7 @@
         @media (max-height: 450px) and (orientation: landscape) {
             .title-banner {
                 padding: 5px 0;
+                height: auto;
             }
             
             .title-banner h1 {
@@ -271,20 +287,24 @@
             }
             
             .content-area {
-                top: 40px;
+                padding-top: 40px;
                 flex-direction: row;
                 justify-content: space-around;
+                align-items: center;
+                min-height: calc(100vh - 60px);
             }
             
             .mode-buttons {
                 margin-bottom: 0;
                 width: 45%;
+                max-width: none;
             }
             
             .logo {
                 width: 45%;
+                margin-bottom: 0;
+                margin-top: 0;
             }
-          
         }
 
         @media (orientation: landscape) {
@@ -292,7 +312,7 @@
                 flex-direction: row;
                 justify-content: space-around;
                 align-items: center;
-                padding: 70px 20px 60px;
+                padding: 70px 20px 20px;
             }
             
             .mode-buttons {

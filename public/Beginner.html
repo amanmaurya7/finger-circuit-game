@@ -508,10 +508,11 @@
         100% { transform: scale(1); }
       }
 
-      @media screen and (max-height: 500px) {
+      /* Enhanced responsive styles for small screens */
+      @media screen and (max-height: 600px) {
         .title-banner {
-          height: 50px;
-          padding: 5px 0;
+          height: 60px;
+          padding: 8px 0;
         }
 
         .title-banner h1 {
@@ -525,34 +526,146 @@
 
         #gameCanvas {
           height: 65%;
-          margin-top: 60px;
-          max-width: 600px;
+          margin-top: 70px;
         }
-
-       
-        /* Adjust result screen for smaller heights */
-        .result-screen {
-          top: 50px;
-          height: calc(100% - 100px);
+        
+        .completion-value {
+          font-size: 120px;
+        }
+        
+        .completion-value .percent {
+          font-size: 24px;
+          margin-top: 70px;
+        }
+        
+        .result-title-en {
+          font-size: 24px;
         }
       }
 
-      @media screen and (max-height: 400px) {
+      @media screen and (max-height: 500px) {
+        .title-banner {
+          height: 50px;
+          padding: 5px 0;
+        }
+
+        .title-banner h1 {
+          font-size: 14px;
+        }
+
         .title-banner h2 {
           display: none;
         }
 
         #gameCanvas {
           height: 60%;
-          margin-top: 40px;
-          max-width: 500px;
+          margin-top: 60px;
+        }
+        
+        .completion-value {
+          font-size: 100px;
+          margin-bottom: 10px;
+        }
+        
+        .completion-value .percent {
+          font-size: 20px;
+          margin-top: 60px;
+        }
+        
+        .result-button {
+          padding: 8px;
+          margin-bottom: 8px;
+        }
+        
+        .share-button, .retry-button {
+          height: 40px;
+          margin-bottom: 15px;
+        }
+        
+        .map-button {
+          height: 35px;
+        }
+      }
+
+      @media screen and (max-width: 360px) {
+        .title-banner h1 {
+          font-size: 14px;
+        }
+        
+        .title-banner h2 {
+          font-size: 10px;
+        }
+        
+        .start-point {
+          width: 80px;
+          font-size: 12px;
+        }
+        
+        .share-content {
+          width: 95%;
+          padding: 20px 15px;
+        }
+        
+        .share-title {
+          font-size: 18px;
+        }
+        
+        .result-button {
+          width: 85%;
         }
       }
 
       @media screen and (min-width: 768px) {
         #gameCanvas {
-          max-width: 1000px;
+          max-width: 700px;
           height: 75%;
+        }
+      }
+      
+      /* Landscape orientation adjustments */
+      @media screen and (max-height: 450px) and (orientation: landscape) {
+        .title-banner {
+          height: 40px;
+          padding: 5px 0;
+        }
+        
+        .title-banner h2 {
+          display: none;
+        }
+        
+        #gameCanvas {
+          height: 80%;
+          margin-top: 50px;
+          max-width: 350px;
+        }
+        
+        .result-screen {
+          padding-top: 40px;
+        }
+        
+        .completion-value {
+          font-size: 90px;
+          margin-bottom: 10px;
+        }
+        
+        .completion-value .percent {
+          font-size: 20px;
+          margin-top: 50px;
+        }
+        
+        .result-button {
+          padding: 6px;
+          margin-bottom: 5px;
+          font-size: 12px;
+        }
+        
+        .share-button, .retry-button {
+          height: 35px;
+          margin-bottom: 10px;
+        }
+        
+        .map-button {
+          height: 30px;
         }
       }
     </style>
