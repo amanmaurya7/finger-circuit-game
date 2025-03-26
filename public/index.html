@@ -28,7 +28,7 @@
             height: 100vh;
             width: 100vw;
         }
-      
+
         .game-container {
             position: relative;
             width: 100%;
@@ -40,7 +40,7 @@
             justify-content: space-between;
             overflow: hidden;
         }
-        
+
         .race-car {
             position: absolute;
             top: 0;
@@ -50,7 +50,7 @@
             object-fit: cover;
             z-index: 0;
         }
-        
+
         .cloud {
             position: absolute;
             background-color: white;
@@ -58,7 +58,7 @@
             height: 10px;
             z-index: 1;
         }
-        
+
         .title-banner {
             position: absolute;
             top: 0;
@@ -76,7 +76,7 @@
             justify-content: center;
             align-items: center;
         }
-        
+
         .title-banner h1 {
             color: black;
             font-size: 18px;
@@ -85,30 +85,30 @@
             letter-spacing: 1px;
             font-weight: normal;
         }
-        
+
         .title-banner h2 {
             color: black;
             font-size: 14px;
             margin: 5px 0 0;
             font-weight: normal;
         }
-        
+
         .highlight-red {
             color: #ff0000;
         }
-        
+
         .content-area {
             position: relative;
             width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-end; /* Changed from center to flex-end */
+            justify-content: flex-end;
             z-index: 2;
             flex: 1;
             padding: 70px 20px 20px;
         }
-        
+
         .mode-buttons {
             display: flex;
             font-family: 'MyCustomFont', sans-serif;
@@ -116,12 +116,12 @@
             gap: 10px;
             width: 100%;
             max-width: 300px;
-            margin-top: 500px;
-            margin-bottom: 20px;
+            margin-bottom: 100px;
             position: relative;
             bottom: 0;
+            /* Removed the large margin-top to prevent pushing content down */
         }
-        
+
         .mode-btn {
             background-color: rgba(255, 255, 255, 0.8);
             border: none;
@@ -136,12 +136,12 @@
             transition: background-color 0.3s, transform 0.2s;
             width: 100%;
         }
-        
+
         .mode-btn:hover {
             background-color: rgba(255, 255, 255, 0.9);
             transform: scale(1.02);
         }
-        
+
         .logo {
             text-align: center;
             color: white;
@@ -151,17 +151,16 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-top: auto;
-            margin-bottom: 20px; /* Reduced from 100px for better responsiveness */
+            margin-bottom: 20px;
             padding: 0 15px;
             width: 100%;
         }
-        
+
         .logo img {
             height: 40px;
             max-width: 100%;
             object-fit: contain;
-            transition: height 0.3s ease; /* Add smooth transition for size changes */
+            transition: height 0.3s ease;
         }
 
         .logo-line {
@@ -173,42 +172,42 @@
             vertical-align: middle;
         }
 
-        /* Improved responsive media queries */
+        /* Responsive adjustments */
         @media (max-height: 600px) {
             .title-banner {
                 padding: 8px 0;
             }
-            
+
             .title-banner h1 {
                 font-size: 16px;
                 margin-top: 0;
             }
-            
+
             .title-banner h2 {
                 font-size: 12px;
                 margin-top: 2px;
             }
-            
+
             .content-area {
                 padding-top: 50px;
+                padding-bottom: 10px;
             }
-            
+
             .mode-buttons {
                 gap: 8px;
                 margin-bottom: 10px;
-                margin-top: 450px; /* Adjusted for smaller screens */
             }
-            
+
             .mode-btn {
                 padding: 10px 12px;
                 font-size: 14px;
-                min-height: 40px; /* Ensure consistent button height */
+                min-height: 40px;
             }
-            
+
             .logo img {
                 height: 30px;
             }
-            
+
             .logo {
                 margin-bottom: 10px;
             }
@@ -218,38 +217,38 @@
             .title-banner {
                 padding: 5px 0;
             }
-            
+
             .title-banner h1 {
                 font-size: 14px;
                 margin: 2px 0;
             }
-            
+
             .title-banner h2 {
                 font-size: 10px;
                 margin: 0;
             }
-            
+
             .content-area {
                 padding-top: 40px;
+                padding-bottom: 5px;
             }
-            
+
             .mode-buttons {
-                margin-top: 300px; /* Adjusted for smaller screens */
-                margin-bottom: 8px;
+                margin-bottom: 5px;
                 gap: 6px;
             }
-            
+
             .mode-btn {
                 padding: 6px 10px;
                 font-size: 12px;
-                min-height: 32px; /* Ensure consistent button height */
+                min-height: 32px;
                 border-radius: 20px;
             }
-            
+
             .logo img {
                 height: 25px;
             }
-            
+
             .logo-line {
                 width: 20px;
                 margin: 0 8px;
@@ -260,48 +259,48 @@
             .title-banner h1 {
                 font-size: 14px;
             }
-            
+
             .title-banner h2 {
                 font-size: 10px;
             }
-            
+
             .mode-buttons {
-                max-width: 250px; /* Narrower buttons on very small screens */
+                max-width: 250px;
             }
-            
+
             .mode-btn {
                 font-size: 12px;
                 padding: 8px 10px;
                 min-height: 36px;
             }
-            
+
             .logo img {
                 height: 25px;
                 max-width: 140px;
             }
-            
+
             .logo-line {
                 width: 15px;
                 margin: 0 5px;
             }
         }
 
-        /* Improved landscape orientation */
+        /* Landscape orientation */
         @media (orientation: landscape) {
             .content-area {
                 flex-direction: column;
-                justify-content: flex-end; /* Changed from center to flex-end */
+                justify-content: flex-end;
                 padding: 70px 20px 20px;
             }
-            
+
             .mode-buttons {
-                margin-top: 20px; /* Adjusted for landscape */
+                margin-top: 20px;
                 width: 70%;
                 max-width: 450px;
-                flex-direction: row; /* Change to horizontal layout in landscape */
+                flex-direction: row;
                 justify-content: center;
             }
-            
+
             .logo {
                 margin-top: 15px;
                 margin-bottom: 15px;
@@ -312,41 +311,41 @@
             .title-banner {
                 padding: 3px 0;
             }
-            
+
             .title-banner h1 {
                 font-size: 12px;
                 margin: 0;
             }
-            
+
             .title-banner h2 {
                 font-size: 8px;
                 margin: 0;
             }
-            
+
             .content-area {
                 padding-top: 30px;
             }
-            
+
             .mode-buttons {
                 gap: 10px;
                 margin-top: 10px;
             }
-            
+
             .mode-btn {
                 padding: 5px 10px;
                 font-size: 11px;
                 min-height: 30px;
                 flex: 1;
             }
-            
+
             .logo {
                 margin-bottom: 8px;
             }
-            
+
             .logo img {
                 height: 20px;
             }
-            
+
             .logo-line {
                 width: 15px;
                 height: 1px;
@@ -358,48 +357,48 @@
             .title-banner {
                 padding: 2px 0;
             }
-            
+
             .content-area {
                 padding-top: 25px;
+                padding-bottom: 2px;
             }
-            
+
             .mode-buttons {
                 gap: 5px;
-                margin-top: 5px;
+                margin-bottom: 2px;
             }
-            
+
             .mode-btn {
                 padding: 4px 8px;
                 font-size: 10px;
                 min-height: 26px;
                 border-radius: 15px;
             }
-            
+
             .logo {
                 margin-bottom: 5px;
             }
-            
+
             .logo img {
                 height: 18px;
             }
         }
-        
-        /* Add new media query for very wide screens */
+
         @media (min-width: 992px) {
             .mode-buttons {
                 max-width: 500px;
             }
-            
+
             .mode-btn {
                 font-size: 18px;
                 padding: 14px 20px;
                 min-height: 50px;
             }
-            
+
             .logo img {
                 height: 50px;
             }
-            
+
             .logo-line {
                 width: 50px;
                 height: 3px;
@@ -410,30 +409,20 @@
 </head>
 <body>
     <div class="game-container">
-        <!-- Race car image (now positioned to take full height/width) -->
         <img src="./assets/car.svg" alt="Formula 1 Race Car" class="race-car">
-        
-        <!-- Decorative clouds -->
         <div class="cloud" style="width: 60px; left: 20%; top: 30%;"></div>
         <div class="cloud" style="width: 40px; left: 30%; top: 35%;"></div>
         <div class="cloud" style="width: 80px; left: 70%; top: 28%;"></div>
         <div class="cloud" style="width: 50px; left: 80%; top: 33%;"></div>
-       
-        <!-- Title banner with highlighted letters -->
         <div class="title-banner">
             <h1>FIN<span class="highlight-red">G</span>ER CIRC<span class="highlight-red">U</span>IT</h1>
             <h2>フィンガーサーキット</h2>
         </div>
-        
-        <!-- Content area wrapper for better positioning -->
         <div class="content-area">
-            <!-- Mode buttons -->
             <div class="mode-buttons">
                 <button class="mode-btn">BEGINNER</button>
                 <button class="mode-btn">CHALLENGE</button>
             </div>
-            
-            <!-- Logo with image -->
             <div class="logo">
                 <span class="logo-line"></span>
                 <img src="./assets/grandprix.svg" alt="Japanese Grand Prix Logo">
@@ -441,14 +430,13 @@
             </div>
         </div>
     </div>
-    
+
     <script>
-        // Add cloud animations
         const clouds = document.querySelectorAll('.cloud');
         clouds.forEach(cloud => {
             const speed = 0.07 + Math.random() * 0.05;
             let position = parseFloat(cloud.style.left);
-            
+
             function moveCloud() {
                 position -= speed;
                 if (position < -10) {
@@ -457,16 +445,14 @@
                 cloud.style.left = position + '%';
                 requestAnimationFrame(moveCloud);
             }
-            
+
             moveCloud();
         });
-        
-        // Add button functionality
+
         const buttons = document.querySelectorAll('.mode-btn');
         buttons.forEach(button => {
             button.addEventListener('click', function() {
                 console.log(this.textContent + ' mode selected');
-                // Navigate to the appropriate page based on button text
                 if (this.textContent === 'BEGINNER') {
                     window.location.href = 'Beginner.html';
                 } else if (this.textContent === 'CHALLENGE') {
