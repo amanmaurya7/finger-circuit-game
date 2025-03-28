@@ -112,7 +112,7 @@
         left: 50%;
         top: 50%;
         transform: translate(-50%, -50%);
-        margin-top: 50px;
+        margin-top: 0; /* Remove the top margin that was pushing it down */
         width: 100%;
         background: rgba(255, 255, 255, 0.95);
         padding: 15px 20px;
@@ -129,12 +129,14 @@
         font-size: 18px;
         margin: 0;
         font-weight: bold;
+        text-align: center; /* Add explicit center alignment */
       }
 
       .mission-banner p {
         color: black;
         font-size: 14px;
         margin: 8px 0 0;
+        text-align: center; /* Add explicit center alignment */
       }
 
       .start-point {
