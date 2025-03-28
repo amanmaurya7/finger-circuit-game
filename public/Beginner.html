@@ -152,7 +152,7 @@
         height: 40px;
         background-color: rgba(255, 102, 153, 0.7);
         border-radius: 20px;
-        font-family: 'MyCustomFont', sans-serif;
+        font-family: 'JapaneseFont', sans-serif;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -230,6 +230,7 @@
         font-size: 14px;
         margin-top: 0;
         margin-bottom: 5px;
+        font-family: 'JapaneseFont', sans-serif;
       }
 
       .result-title-en {
@@ -245,6 +246,7 @@
         font-size: 22px;
         margin-bottom: 5px;
         text-align: center;
+        font-family: 'JapaneseFont', sans-serif;
       }
 
       .completion-value {
@@ -498,6 +500,7 @@
         color: #fd6aa0;
         margin-bottom: 5px;
         margin-left: 50px;
+        font-family: 'JapaneseFont', sans-serif;
       }
 
       .share-score-value {
@@ -727,7 +730,7 @@
 
       <div class="mission-banner">
         <h2>MISSION</h2>
-        <p>青い補助線に沿ってサーキットを描いてみよう！</p>
+        <p style="font-family: 'JapaneseFont';">青い補助線に沿ってサーキットを描いてみよう！</p>
       </div>
 
       <div id="startPoint" class="start-point">スタート</div>
@@ -748,17 +751,17 @@
 
       <div id="resultScreen" class="result-screen">
         <div class="result-modal">
-          <div class="result-title-jp">ミッションクリア</div>
+          <div class="result-title-jp" style="font-family: 'JapaneseFont', sans-serif;">ミッションクリア</div>
           <div class="result-title-en">MISSION CLEAR</div>
-          <div class="completion-label">完成度</div>
+          <div class="completion-label" style="font-family: 'JapaneseFont', sans-serif;">完成度</div>
           <div class="completion-value">
             <span id="accuracyResult"></span>
             <span class="percent">%</span>
           </div>
-          <button id="shareButton" class="result-button share-button">
+          <button id="shareButton" class="result-button share-button" style="font-family: 'JapaneseFont', sans-serif;">
             SNSでシェアする
           </button>
-          <button id="retryButton" class="result-button retry-button">
+          <button id="retryButton" class="result-button retry-button" style="font-family: 'JapaneseFont', sans-serif;">
             もう一度遊ぶ
           </button>
           <button id="mapButton" class="result-button map-button" onclick="window.location.href='/'">
@@ -773,7 +776,7 @@
           <div class="share-game-title">FINGER CIRCUIT</div>
           <div class="share-game-mode">BEGINNER</div>
         </div>
-        <div class="share-score-label">完成度</div>
+        <div class="share-score-label" style="font-family: 'JapaneseFont', sans-serif;">完成度</div>
         <div class="share-score-value">
           <span id="shareAccuracyValue"></span>
           <span style="font-size: 30px;">%</span>
@@ -1905,6 +1908,7 @@ https://liff.line.me/2006572406-D3OkWx32?tcode=YAQaP0000013430
           const loadingMsg = document.createElement("p");
           loadingMsg.className = "share-loading";
           loadingMsg.textContent = "生成中...";
+          loadingMsg.style.fontFamily = "'JapaneseFont', sans-serif";
           document.querySelector(".share-content").insertBefore(loadingMsg, document.getElementById("universalShareButton"));
           
           document.getElementById("shareModal").style.display = "flex";
