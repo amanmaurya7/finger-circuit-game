@@ -467,6 +467,44 @@
                 }
             });
         });
+        
+        // Force reload of resources when returning to this page
+        window.addEventListener('pageshow', function(event) {
+            // If the page is accessed from browser cache (back/forward navigation)
+            if (event.persisted) {
+                // Reload the car image to ensure it displays properly
+                const carImage = document.querySelector('.race-car');
+                if (carImage) {
+                    const currentSrc = carImage.src;
+                    carImage.src = '';
+                    setTimeout(() => {
+                        carImage.src = currentSrc + '?t=' + new Date().getTime();
+                    }, 10);
+                }
+            }
+        });
+
+        // Additional fix to ensure the image loads properly when returning to the page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Force reload of car image on page load
+            const carImage = document.querySelector('.race-car');
+            if (carImage) {
+                const originalSrc = carImage.src;
+                // Add a timestamp to bypass cache
+                carImage.src = originalSrc + '?t=' + new Date().getTime();
+            }
+            
+            // Set a flag in sessionStorage to indicate this page has been loaded
+            if (!sessionStorage.getItem('pageLoaded')) {
+                sessionStorage.setItem('pageLoaded', 'true');
+            } else {
+                // This is a return visit within the same session
+                // Force a full reload if needed
+                if (performance.navigation.type === 2) { // Back/forward navigation
+                    window.location.reload(true);
+                }
+            }
+        });
     </script>
 </body>
 </html>

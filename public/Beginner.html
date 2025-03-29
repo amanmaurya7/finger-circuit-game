@@ -2024,7 +2024,22 @@ https://liff.line.me/2006572406-D3OkWx32?tcode=YAQaP0000013430
         }
 
         function returnToMap() {
-          window.location.href = "https://new-jp-map.vercel.app/";
+          // Add a flag to indicate we're navigating back
+          sessionStorage.setItem('returningToMap', 'true');
+          
+          // Clear any cached images before returning
+          if (window.caches && navigator.serviceWorker) {
+            // Try to clear image cache if possible
+            caches.open('image-cache').then(cache => {
+              cache.delete('./assets/car.svg').then(() => {
+                console.log('Car image cleared from cache');
+              });
+            }).catch(err => {
+              console.log('Cache clearing not supported');
+            });
+          }
+          
+          window.location.href = "/";
         }
 
         function resetGame() {
