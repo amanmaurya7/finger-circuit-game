@@ -461,7 +461,7 @@
         background-image: url("assets/SNS-bg.png");
         background-size: cover;
         background-position: center;
-        position: fixed;
+        position: absolute;
         left: -9999px;
         top: -9999px;
         opacity: 0;
@@ -469,6 +469,9 @@
         display: flex;
         flex-direction: column;
         padding: 20px;
+        pointer-events: none;
+        user-select: none;
+        touch-action: none;
       }
 
       .share-header {
@@ -1881,6 +1884,7 @@ https://liff.line.me/2006572406-D3OkWx32?tcode=YAQaP0000013430
             document.getElementById("shareModal").style.display = "none";
           } catch (error) {
             console.error('Share process error:', error);
+            document.getElementById("shareModal").style.display = "none";
           }
         }
 
@@ -1913,6 +1917,9 @@ https://liff.line.me/2006572406-D3OkWx32?tcode=YAQaP0000013430
           
           document.getElementById("shareModal").style.display = "flex";
           
+          // Prevent scrolling and zooming during share generation
+          document.body.style.overflow = "hidden";
+          
           // Use a timeout to let the modal appear before generating the image
           setTimeout(async () => {
             try {
@@ -1931,6 +1938,9 @@ https://liff.line.me/2006572406-D3OkWx32?tcode=YAQaP0000013430
               }
             } catch (error) {
               console.error('Error generating share image:', error);
+            } finally {
+              // Always restore scrolling
+              document.body.style.overflow = "";
             }
             
             // Remove loading message
@@ -1956,12 +1966,18 @@ https://liff.line.me/2006572406-D3OkWx32?tcode=YAQaP0000013430
         async function generateScoreCard() {
           const scoreElement = document.getElementById("scoreElement");
           
-          // Make the element visible to html2canvas but still hidden to user
-          scoreElement.style.opacity = '1';
-          scoreElement.style.left = '0';
-          scoreElement.style.top = '0';
-          
           try {
+            // Store current scroll position
+            const scrollX = window.scrollX;
+            const scrollY = window.scrollY;
+            
+            // Position the element off-screen but visible to html2canvas
+            scoreElement.style.position = 'absolute';
+            scoreElement.style.left = '-1000px';
+            scoreElement.style.top = '-1000px';
+            scoreElement.style.opacity = '1';
+            scoreElement.style.zIndex = '-9999';
+            
             // Add a small delay to ensure the element is rendered properly
             await new Promise(resolve => setTimeout(resolve, 200));
             
@@ -1972,7 +1988,9 @@ https://liff.line.me/2006572406-D3OkWx32?tcode=YAQaP0000013430
               logging: false,
               useCORS: true,
               allowTaint: true,
-              foreignObjectRendering: false // More compatible rendering
+              foreignObjectRendering: false, // More compatible rendering
+              scrollX: 0,
+              scrollY: 0
             });
             
             // Convert canvas to image URL with maximum quality
@@ -1981,17 +1999,26 @@ https://liff.line.me/2006572406-D3OkWx32?tcode=YAQaP0000013430
             // Set the image source in the share modal
             document.getElementById("shareImage").src = imageUrl;
             
-            // Hide the score element again
+            // Hide the score element again - ensure it's fully hidden
             scoreElement.style.opacity = '0';
             scoreElement.style.left = '-9999px';
             scoreElement.style.top = '-9999px';
+            scoreElement.style.zIndex = '-9999';
+            
+            // Restore scroll position if needed
+            if (window.scrollX !== scrollX || window.scrollY !== scrollY) {
+              window.scrollTo(scrollX, scrollY);
+            }
             
             return imageUrl;
           } catch (error) {
             console.error('Error generating share image:', error);
+            
+            // Always hide the element in case of error
             scoreElement.style.opacity = '0';
             scoreElement.style.left = '-9999px';
             scoreElement.style.top = '-9999px';
+            scoreElement.style.zIndex = '-9999';
             
             // Create a fallback image with just text
             try {
