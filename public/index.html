@@ -6,6 +6,16 @@
     <title>Finger Circuit</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap" rel="stylesheet">
     <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+            overflow-y: auto; /* Enable vertical scrolling at the root level */
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        }
+
         @font-face {
             font-family: 'MyCustomFont';
             src: url('./assets/display-regular.ttf') format('truetype');
@@ -18,7 +28,7 @@
             src: url('./assets/japanese.ttc') format('truetype');
             font-weight: normal;
             font-style: normal;
-      }
+        }
 
         * {
             margin: 0;
@@ -26,26 +36,48 @@
             box-sizing: border-box;
         }
 
+        /* Enhanced custom scrollbar styles for better visibility */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #ff6699;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ff4d88;
+        }
+
+        /* Firefox scrollbar */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #ff6699 rgba(0, 0, 0, 0.05);
+        }
+
         body {
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-            overflow-y: auto;
             font-family: 'MyCustomFont', sans-serif;
-            height: 100vh;
-            width: 100vw;
+            touch-action: pan-y; /* Enable vertical scrolling on touch devices */
+            position: relative;
         }
 
         .game-container {
             position: relative;
             width: 100%;
-            height: 100vh;
+            min-height: 100vh; /* Use min-height instead of height to allow expansion */
             background: linear-gradient(to bottom, #ff69b4, white, #4169e1);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto; /* Enable vertical scrolling */
+            padding-bottom: 20px; /* Add padding at the bottom to prevent content from being cut off */
         }
 
         .race-car {
@@ -67,7 +99,7 @@
         }
 
         .title-banner {
-            position: absolute;
+            position: fixed; /* Keep fixed to stay at the top */
             top: 0;
             left: 0;
             right: 0;
@@ -77,12 +109,12 @@
             border-radius: 0 0 20px 20px;
             text-align: center;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            z-index: 2;
+            z-index: 10; /* Ensure it's above everything */
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100px;
+            height: 65px;
         }
 
         .title-banner h1 {
@@ -114,7 +146,10 @@
             justify-content: flex-end;
             z-index: 2;
             flex: 1;
-            padding: 70px 20px 20px;
+            padding: 70px 20px 20px; /* Top padding to account for fixed header */
+            overflow-y: auto; /* Enable scrolling within content area */
+            min-height: calc(100vh - 65px); /* Subtract header height from viewport height */
+            margin-top: 65px; /* Add margin equal to header height */
         }
 
         .mode-buttons {
@@ -127,7 +162,6 @@
             margin-bottom: 60px;
             position: relative;
             bottom: 0;
-            /* Removed the large margin-top to prevent pushing content down */
         }
 
         .mode-btn {
@@ -184,6 +218,7 @@
         @media (max-height: 600px) {
             .title-banner {
                 padding: 8px 0;
+                height: 60px; /* Reduced height for smaller screens */
             }
 
             .title-banner h1 {
@@ -197,7 +232,9 @@
             }
 
             .content-area {
-                padding-top: 50px;
+                margin-top: 60px; /* Match header height */
+                min-height: calc(100vh - 60px); /* Adjust for smaller header */
+                padding-top: 10px; /* Reduced padding since we're using margin-top */
                 padding-bottom: 10px;
             }
 
@@ -224,6 +261,7 @@
         @media (max-height: 500px) {
             .title-banner {
                 padding: 5px 0;
+                height: 50px; /* Further reduced height */
             }
 
             .title-banner h1 {
@@ -237,7 +275,9 @@
             }
 
             .content-area {
-                padding-top: 40px;
+                margin-top: 50px; /* Match header height */
+                min-height: calc(100vh - 50px); /* Adjust for smaller header */
+                padding-top: 10px;
                 padding-bottom: 5px;
             }
 
@@ -298,7 +338,7 @@
             .content-area {
                 flex-direction: column;
                 justify-content: flex-end;
-                padding: 70px 20px 20px;
+                padding: 10px 20px 20px; /* Reduced top padding since we're using margin-top */
             }
 
             .mode-buttons {
@@ -318,6 +358,7 @@
         @media (max-height: 450px) and (orientation: landscape) {
             .title-banner {
                 padding: 3px 0;
+                height: 40px; /* Smaller header for landscape */
             }
 
             .title-banner h1 {
@@ -331,7 +372,9 @@
             }
 
             .content-area {
-                padding-top: 30px;
+                margin-top: 40px; /* Match header height */
+                min-height: calc(100vh - 40px); /* Adjust for smaller header */
+                padding-top: 10px;
             }
 
             .mode-buttons {
@@ -364,10 +407,13 @@
         @media (max-height: 350px) {
             .title-banner {
                 padding: 2px 0;
+                height: 35px; /* Even smaller header */
             }
 
             .content-area {
-                padding-top: 25px;
+                margin-top: 35px; /* Match header height */
+                min-height: calc(100vh - 35px); /* Adjust for smaller header */
+                padding-top: 10px;
                 padding-bottom: 2px;
             }
 
@@ -389,6 +435,23 @@
 
             .logo img {
                 height: 18px;
+            }
+        }
+
+        /* Specific styles for iPhone SE and mini */
+        @media screen and (max-width: 375px) and (max-height: 667px) {
+            .content-area {
+                padding-bottom: 20px;
+            }
+            
+            .mode-buttons {
+                margin-top: 10px;
+                margin-bottom: 30px;
+            }
+            
+            /* Ensure buttons are visible with scrolling */
+            .logo {
+                margin-bottom: 30px;
             }
         }
 
@@ -505,6 +568,26 @@
                     window.location.reload(true);
                 }
             }
+            
+            // Ensure content is properly positioned below fixed header
+            function adjustContentPadding() {
+                const titleBanner = document.querySelector('.title-banner');
+                const contentArea = document.querySelector('.content-area');
+                if (titleBanner && contentArea) {
+                    const titleHeight = titleBanner.offsetHeight;
+                    contentArea.style.marginTop = titleHeight + 'px';
+                    contentArea.style.minHeight = `calc(100vh - ${titleHeight}px)`;
+                }
+            }
+            
+            // Run on load and on resize
+            adjustContentPadding();
+            window.addEventListener('resize', adjustContentPadding);
+            
+            // Enable smooth scrolling for iOS
+            document.addEventListener('touchmove', function(e) {
+                // Allow default scrolling behavior
+            }, { passive: true });
         });
     </script>
 </body>
