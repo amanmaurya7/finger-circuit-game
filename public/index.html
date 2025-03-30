@@ -38,26 +38,41 @@
 
         /* Enhanced custom scrollbar styles for better visibility */
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 0; /* Hidden by default */
+            display: none; /* Hide scrollbars by default */
         }
 
-        ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.05);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #ff6699;
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #ff4d88;
-        }
-
-        /* Firefox scrollbar */
+        /* Firefox scrollbar - hidden by default */
         * {
-            scrollbar-width: thin;
-            scrollbar-color: #ff6699 rgba(0, 0, 0, 0.05);
+            scrollbar-width: none;
+            scrollbar-color: transparent transparent;
+        }
+        
+        /* Show scrollbars only for small devices like iPhone SE and mini */
+        @media screen and (max-width: 375px) and (max-height: 667px) {
+            ::-webkit-scrollbar {
+                width: 8px;
+                display: block; /* Show scrollbars on small devices */
+            }
+            
+            ::-webkit-scrollbar-track {
+                background: rgba(0, 0, 0, 0.05);
+            }
+            
+            ::-webkit-scrollbar-thumb {
+                background: #ff6699;
+                border-radius: 4px;
+            }
+            
+            ::-webkit-scrollbar-thumb:hover {
+                background: #ff4d88;
+            }
+            
+            /* Firefox scrollbar for small devices */
+            * {
+                scrollbar-width: thin;
+                scrollbar-color: #ff6699 rgba(0, 0, 0, 0.05);
+            }
         }
 
         body {
