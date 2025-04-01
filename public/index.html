@@ -586,6 +586,51 @@
             document.addEventListener('touchmove', function(e) {
                 // Allow default scrolling behavior
             }, { passive: true });
+            
+            // Enhanced scroll handling with visibility detection
+            function enhanceScrolling() {
+                // Make sure scrollbar is hidden everywhere
+                document.documentElement.style.overflow = 'auto';
+                document.documentElement.style.scrollbarWidth = 'none';
+                document.documentElement.style.msOverflowStyle = 'none';
+                
+                // Add iOS momentum scrolling to all scrollable elements
+                const scrollElements = [document.documentElement, document.body, 
+                                       document.querySelector('.game-container'), 
+                                       document.querySelector('.content-area')];
+                                       
+                scrollElements.forEach(el => {
+                    if (el) {
+                        el.style.WebkitOverflowScrolling = 'touch';
+                        el.style.overflowY = 'auto';
+                    }
+                });
+                
+                // Handle scroll visibility with IntersectionObserver
+                const observerOptions = {
+                    root: null,
+                    rootMargin: '0px',
+                    threshold: 0.1
+                };
+                
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                        }
+                    });
+                }, observerOptions);
+                
+                // Observe buttons and logo for scroll visibility
+                const elements = document.querySelectorAll('.mode-btn, .logo');
+                elements.forEach(el => observer.observe(el));
+                
+                // Force a scroll event to check initial visibility
+                window.dispatchEvent(new Event('scroll'));
+            }
+            
+            // Initialize enhanced scrolling
+            enhanceScrolling();
         });
     </script>
 </body>
