@@ -88,39 +88,38 @@
         }
 
         .title-banner {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            width: 100%;
-            background: white;
-            padding: 15px 0;
-            border-radius: 0 0 20px 20px;
-            text-align: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 65px;
-        }
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        padding: 10px 0;
+        border-radius: 0 0 20px 20px;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        z-index: 100; /* Increased from 10 to appear above share modal */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 65px;
+      }
 
-        .title-banner h1 {
-            color: black;
-            font-size: 25px;
-            margin: 0;
-            letter-spacing: 1px;
-            font-weight: normal;
-        }
+      .title-banner h1 {
+        color: black;
+        font-size: 1.6rem;
+        margin: 0;
+        letter-spacing: 1px;
+        font-weight: normal;
+      }
 
-        .title-banner h2 {
-            color: black;
-            font-size: 10px;
-            margin: 5px 0 0;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
+      .title-banner h2 {
+        color: black;
+        font-size: 12px;
+        margin: 5px 0 0;
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
 
 
         .content-area {
@@ -219,19 +218,19 @@
         /* Responsive adjustments */
         @media (max-height: 700px) {
             .title-banner {
-                padding: 8px 0;
-                height: 50px;
-            }
+          height: 60px;
+          padding: 8px 0;
+        }
 
-            .title-banner h1 {
-                font-size: 16px;
-                margin-top: 0;
-            }
+        .title-banner h1 {
+          font-size: 1.4rem;
+        }
 
-            .title-banner h2 {
-                font-size: 12px;
-                margin-top: 2px;
-            }
+        .title-banner h2 {
+          font-size: 11px;
+          margin-top: 2px;
+        }
+
 
             .content-area {
                 margin-top: 50px;
@@ -270,19 +269,17 @@
 
         @media (max-height: 500px) {
             .title-banner {
-                padding: 5px 0;
-                height: 40px;
-            }
+          height: 50px;
+          padding: 5px 0;
+        }
 
-            .title-banner h1 {
-                font-size: 14px;
-                margin: 2px 0;
-            }
+        .title-banner h1 {
+          font-size: 14px;
+        }
 
-            .title-banner h2 {
-                font-size: 10px;
-                margin: 0;
-            }
+        .title-banner h2 {
+          display: none;
+        }
 
             .content-area {
                 margin-top: 40px;
@@ -323,12 +320,13 @@
 
         @media (max-width: 360px) {
             .title-banner h1 {
-                font-size: 14px;
-            }
-
-            .title-banner h2 {
-                font-size: 10px;
-            }
+          font-size: 14px;
+        }
+        
+        .title-banner h2 {
+          font-size: 10px;
+        }
+        
 
             .mode-buttons {
                 max-width: 250px;
@@ -407,20 +405,13 @@
 
         @media (max-height: 450px) and (orientation: landscape) {
             .title-banner {
-                padding: 3px 0;
-                height: 35px;
-            }
-
-            .title-banner h1 {
-                font-size: 12px;
-                margin: 0;
-            }
-
-            .title-banner h2 {
-                font-size: 8px;
-                margin: 0;
-            }
-
+          height: 40px;
+          padding: 5px 0;
+        }
+        
+        .title-banner h2 {
+          display: none;
+        }
             .content-area {
                 margin-top: 35px;
                 min-height: calc(100vh - 35px - 40px);
@@ -527,8 +518,9 @@
             <h1>
               FIN<span style="color: #E00400;">G</span>ER CIRC<span style="color: #E00400;">U</span>IT
             </h1>
-            <h2>フィンガーサーキット</h2>
+            <h2 style="font-family: 'JapaneseFont';">フィンガーサーキット</h2>
           </div>
+
         <div class="content-area">
             <div class="mode-buttons">
                 <button class="mode-btn">BEGINNER</button>
